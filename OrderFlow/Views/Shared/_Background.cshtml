@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+
+     <link rel="stylesheet" href="~/Scripts/CSS/Background.css" />
+</head>
+<body>
+    <div id="screenSpace" class="workspace">
+        <div id="header" class="headers" style="border: 1px solid black;">
+            <span class="headertext">@Model.Header</span>
+        </div>
+        @RenderBody()
+    </div>
+
+    <script type="text/javascript" src="~/Scripts/Background.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+        $("#screenSpace").css("height", getHeightInPx(97));
+        $("#header").css("height", getHeightInPx(5));
+        });
+    </script>
+</body>
+</html>

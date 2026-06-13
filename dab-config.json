@@ -1,0 +1,1411 @@
+{
+  "$schema": "https://github.com/Azure/data-api-builder/releases/download/v2.0.8/dab.draft.schema.json",
+  "data-source": {
+    "database-type": "mssql",
+    "connection-string": "@env('dab-connection-string')",
+    "options": {
+      "set-session-context": false
+    }
+  },
+  "runtime": {
+    "rest": {
+      "enabled": true,
+      "path": "/api",
+      "request-body-strict": false
+    },
+    "graphql": {
+      "enabled": true,
+      "path": "/graphql",
+      "allow-introspection": true
+    },
+    "mcp": {
+      "enabled": true,
+      "path": "/mcp"
+    },
+    "host": {
+      "cors": {
+        "origins": [],
+        "allow-credentials": false
+      },
+      "authentication": {
+        "provider": "Unauthenticated"
+      },
+      "mode": "development"
+    },
+    "telemetry": {
+      "open-telemetry": {
+        "enabled": true,
+        "endpoint": "@env('OTEL_EXPORTER_OTLP_ENDPOINT')",
+        "headers": "@env('OTEL_EXPORTER_OTLP_HEADERS')",
+        "service-name": "@env('OTEL_SERVICE_NAME')"
+      }
+    }
+  },
+  "autoentities": {},
+  "entities": {
+    "AdminLog": {
+      "source": {
+        "object": "[dbo].[AdminLogs]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "AdminLog",
+          "plural": "AdminLogs"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "AdminUserId",
+                  "ActionType",
+                  "EntityName",
+                  "EntityId",
+                  "OldValues",
+                  "NewValues",
+                  "IpAddress",
+                  "CreatedAt"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "Advantage": {
+      "source": {
+        "object": "[dbo].[Advantages]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "Advantage",
+          "plural": "Advantages"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Title",
+                  "Description",
+                  "IconClass",
+                  "DisplayOrder"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "AspNetRoleClaim": {
+      "source": {
+        "object": "[dbo].[AspNetRoleClaims]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "AspNetRoleClaim",
+          "plural": "AspNetRoleClaims"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "RoleId",
+                  "ClaimType",
+                  "ClaimValue"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "AspNetRole": {
+          "cardinality": "one",
+          "target.entity": "AspNetRole",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "AspNetRole": {
+      "source": {
+        "object": "[dbo].[AspNetRoles]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "AspNetRole",
+          "plural": "AspNetRoles"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Name",
+                  "NormalizedName",
+                  "ConcurrencyStamp",
+                  "Description"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "AspNetRoleClaim": {
+          "cardinality": "many",
+          "target.entity": "AspNetRoleClaim",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        },
+        "AspNetUserRole": {
+          "cardinality": "many",
+          "target.entity": "AspNetUserRole",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "AspNetUserClaim": {
+      "source": {
+        "object": "[dbo].[AspNetUserClaims]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "AspNetUserClaim",
+          "plural": "AspNetUserClaims"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "UserId",
+                  "ClaimType",
+                  "ClaimValue"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "AspNetUser": {
+          "cardinality": "one",
+          "target.entity": "AspNetUser",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "AspNetUserLogin": {
+      "source": {
+        "object": "[dbo].[AspNetUserLogins]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "AspNetUserLogin",
+          "plural": "AspNetUserLogins"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "LoginProvider",
+                  "ProviderKey",
+                  "ProviderDisplayName",
+                  "UserId"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "AspNetUser": {
+          "cardinality": "one",
+          "target.entity": "AspNetUser",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "AspNetUserRole": {
+      "source": {
+        "object": "[dbo].[AspNetUserRoles]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "AspNetUserRole",
+          "plural": "AspNetUserRoles"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "UserId",
+                  "RoleId"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "AspNetRole": {
+          "cardinality": "one",
+          "target.entity": "AspNetRole",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        },
+        "AspNetUser": {
+          "cardinality": "one",
+          "target.entity": "AspNetUser",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "AspNetUser": {
+      "source": {
+        "object": "[dbo].[AspNetUsers]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "AspNetUser",
+          "plural": "AspNetUsers"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "UserName",
+                  "NormalizedUserName",
+                  "Email",
+                  "NormalizedEmail",
+                  "EmailConfirmed",
+                  "PasswordHash",
+                  "SecurityStamp",
+                  "ConcurrencyStamp",
+                  "PhoneNumber",
+                  "PhoneNumberConfirmed",
+                  "TwoFactorEnabled",
+                  "LockoutEnd",
+                  "LockoutEnabled",
+                  "AccessFailedCount",
+                  "FirstName",
+                  "LastName",
+                  "CreatedAt",
+                  "LastLoginAt"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "AspNetUserClaim": {
+          "cardinality": "many",
+          "target.entity": "AspNetUserClaim",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        },
+        "AspNetUserLogin": {
+          "cardinality": "many",
+          "target.entity": "AspNetUserLogin",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        },
+        "AspNetUserRole": {
+          "cardinality": "many",
+          "target.entity": "AspNetUserRole",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        },
+        "AspNetUserToken": {
+          "cardinality": "many",
+          "target.entity": "AspNetUserToken",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "AspNetUserToken": {
+      "source": {
+        "object": "[dbo].[AspNetUserTokens]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "AspNetUserToken",
+          "plural": "AspNetUserTokens"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "UserId",
+                  "LoginProvider",
+                  "Name",
+                  "Value"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "AspNetUser": {
+          "cardinality": "one",
+          "target.entity": "AspNetUser",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "BlogCategory": {
+      "source": {
+        "object": "[dbo].[BlogCategories]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "BlogCategory",
+          "plural": "BlogCategories"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Name",
+                  "Slug",
+                  "Description"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "BlogPost": {
+          "cardinality": "many",
+          "target.entity": "BlogPost",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "BlogPost": {
+      "source": {
+        "object": "[dbo].[BlogPosts]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "BlogPost",
+          "plural": "BlogPosts"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Title",
+                  "Slug",
+                  "Excerpt",
+                  "Content",
+                  "ImageUrl",
+                  "CategoryId",
+                  "PublishedAt",
+                  "IsPublished",
+                  "ViewsCount"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "BlogCategory": {
+          "cardinality": "one",
+          "target.entity": "BlogCategory",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        },
+        "BlogPostTag": {
+          "cardinality": "many",
+          "target.entity": "BlogPostTag",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "BlogPostTag": {
+      "source": {
+        "object": "[dbo].[BlogPostTags]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "BlogPostTag",
+          "plural": "BlogPostTags"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "BlogPostId",
+                  "TagId"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "BlogPost": {
+          "cardinality": "one",
+          "target.entity": "BlogPost",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        },
+        "Tag": {
+          "cardinality": "one",
+          "target.entity": "Tag",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "ContactMessage": {
+      "source": {
+        "object": "[dbo].[ContactMessages]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "ContactMessage",
+          "plural": "ContactMessages"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Name",
+                  "Email",
+                  "Message",
+                  "CreatedAt",
+                  "IsRead",
+                  "RepliedAt"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "EmailTemplate": {
+      "source": {
+        "object": "[dbo].[EmailTemplates]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "EmailTemplate",
+          "plural": "EmailTemplates"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Name",
+                  "Subject",
+                  "BodyHtml",
+                  "Variables",
+                  "IsActive"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "Order": {
+      "source": {
+        "object": "[dbo].[Orders]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "Order",
+          "plural": "Orders"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "FullName",
+                  "Company",
+                  "Email",
+                  "Phone",
+                  "Methodology",
+                  "Description",
+                  "FilePathsJson",
+                  "GdprConsent",
+                  "Status",
+                  "CreatedAt"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "PaymentDetail": {
+      "source": {
+        "object": "[dbo].[PaymentDetails]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "PaymentDetail",
+          "plural": "PaymentDetails"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Inn",
+                  "BankName",
+                  "AccountNumber",
+                  "CardNumber",
+                  "CryptoWallet",
+                  "YooMoneyLink"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "PortfolioCategory": {
+      "source": {
+        "object": "[dbo].[PortfolioCategories]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "PortfolioCategory",
+          "plural": "PortfolioCategories"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Name",
+                  "Slug",
+                  "Description"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "PortfolioItemCategory": {
+          "cardinality": "many",
+          "target.entity": "PortfolioItemCategory",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "PortfolioItemCategory": {
+      "source": {
+        "object": "[dbo].[PortfolioItemCategories]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "PortfolioItemCategory",
+          "plural": "PortfolioItemCategories"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "PortfolioItemId",
+                  "CategoryId"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "PortfolioCategory": {
+          "cardinality": "one",
+          "target.entity": "PortfolioCategory",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        },
+        "PortfolioItem": {
+          "cardinality": "one",
+          "target.entity": "PortfolioItem",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "PortfolioItem": {
+      "source": {
+        "object": "[dbo].[PortfolioItems]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "PortfolioItem",
+          "plural": "PortfolioItems"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Title",
+                  "Description",
+                  "PreviewImageUrl",
+                  "Methodology",
+                  "Technologies",
+                  "DurationDays",
+                  "ProjectUrl",
+                  "IsPublished",
+                  "CreatedAt"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "PortfolioItemCategory": {
+          "cardinality": "many",
+          "target.entity": "PortfolioItemCategory",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        },
+        "PortfolioTechnology": {
+          "cardinality": "many",
+          "target.entity": "PortfolioTechnology",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "PortfolioTechnology": {
+      "source": {
+        "object": "[dbo].[PortfolioTechnologies]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "PortfolioTechnology",
+          "plural": "PortfolioTechnologies"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "PortfolioItemId",
+                  "TechnologyId"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "PortfolioItem": {
+          "cardinality": "one",
+          "target.entity": "PortfolioItem",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        },
+        "Technology": {
+          "cardinality": "one",
+          "target.entity": "Technology",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "SeoSetting": {
+      "source": {
+        "object": "[dbo].[SeoSettings]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "SeoSetting",
+          "plural": "SeoSettings"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "PageRoute",
+                  "MetaTitle",
+                  "MetaDescription",
+                  "MetaKeywords",
+                  "CanonicalUrl",
+                  "Robots",
+                  "OgTitle",
+                  "OgDescription",
+                  "OgImage",
+                  "OgImageAlt",
+                  "OgType",
+                  "JsonLdSchema"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "Service": {
+      "source": {
+        "object": "[dbo].[Services]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "Service",
+          "plural": "Services"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Title",
+                  "Description",
+                  "IconClass",
+                  "IsActive",
+                  "DisplayOrder"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "SiteSetting": {
+      "source": {
+        "object": "[dbo].[SiteSettings]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "SiteSetting",
+          "plural": "SiteSettings"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "SiteName",
+                  "Phone",
+                  "Email",
+                  "Telegram",
+                  "WhatsApp",
+                  "Address",
+                  "MapEmbedUrl",
+                  "ResponseHours",
+                  "DefaultOgImage",
+                  "CreatedAt",
+                  "UpdatedAt"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "SubscriptionEmail": {
+      "source": {
+        "object": "[dbo].[SubscriptionEmails]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "SubscriptionEmail",
+          "plural": "SubscriptionEmails"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Email",
+                  "Name",
+                  "SubscribedAt",
+                  "IsActive",
+                  "UnsubscribeToken"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "SystemNotification": {
+      "source": {
+        "object": "[dbo].[SystemNotifications]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "SystemNotification",
+          "plural": "SystemNotifications"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Title",
+                  "Message",
+                  "Type",
+                  "IsRead",
+                  "CreatedAt",
+                  "ForAdminOnly"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "Tag": {
+      "source": {
+        "object": "[dbo].[Tags]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "Tag",
+          "plural": "Tags"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Name",
+                  "Slug"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "BlogPostTag": {
+          "cardinality": "many",
+          "target.entity": "BlogPostTag",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "Technology": {
+      "source": {
+        "object": "[dbo].[Technologies]",
+        "type": "table"
+      },
+      "fields": [],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "Technology",
+          "plural": "Technologies"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "Name",
+                  "Slug",
+                  "Category",
+                  "IconClass"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "relationships": {
+        "PortfolioTechnology": {
+          "cardinality": "many",
+          "target.entity": "PortfolioTechnology",
+          "source.fields": [],
+          "target.fields": [],
+          "linking.source.fields": [],
+          "linking.target.fields": []
+        }
+      }
+    },
+    "Testimonial": {
+      "source": {
+        "object": "[dbo].[Testimonials]",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "Testimonial",
+          "plural": "Testimonials"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "*",
+              "fields": {
+                "exclude": [],
+                "include": [
+                  "Id",
+                  "ClientName",
+                  "Company",
+                  "Text",
+                  "Rating",
+                  "IsPublished",
+                  "PublishedAt"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "CleanupOldLog": {
+      "source": {
+        "object": "[dbo].[CleanupOldLogs]",
+        "type": "stored-procedure"
+      },
+      "graphql": {
+        "enabled": true,
+        "operation": "query",
+        "type": {
+          "singular": "CleanupOldLog",
+          "plural": "CleanupOldLogs"
+        }
+      },
+      "rest": {
+        "enabled": true,
+        "methods": [
+          "get"
+        ]
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "execute"
+            }
+          ]
+        }
+      ]
+    },
+    "GetOrderStatistic": {
+      "source": {
+        "object": "[dbo].[GetOrderStatistics]",
+        "type": "stored-procedure"
+      },
+      "graphql": {
+        "enabled": true,
+        "operation": "query",
+        "type": {
+          "singular": "GetOrderStatistic",
+          "plural": "GetOrderStatistics"
+        }
+      },
+      "rest": {
+        "enabled": true,
+        "methods": [
+          "get"
+        ]
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "execute"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,623 @@
+﻿/* OrderFlow\wwwroot\Scripts\CSS\Background.css */
+.workspace {
+    width: 100%;
+}
+.headers {
+    @apply .workspace;
+    font-size: 24pt;
+    font-weight: 700;
+    color: #FFFFFF;
+    background-color: #2563EB;
+}
+.headertext
+{
+    margin-left: 2.6%;
+}
+.heroplace
+{
+    width: 70%;
+}
+/* Базовый размер шрифта для всей страницы. 
+   От него будут рассчитываться все пропорции кнопок */
+html {
+    font-size: 16px;
+}
+
+/* На маленьких экранах (мобилках) чуть уменьшаем базовый шрифт, 
+   и кнопки автоматически пропорционально ужмутся! */
+@media (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+}
+
+/* Контейнер для кнопок: на десктопе в ряд, на мобилках — друг под другом */
+.hero-actions {
+    display: flex;
+    gap: 1rem; /* Отступ между кнопками адаптируется */
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 500px; /* Ограничение общей ширины блока */
+}
+
+/* Общие адаптивные стили для обеих кнопок */
+.btn {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 1rem; /* Зависит от размера шрифта html */
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    /* Внутренние отступы в rem, чтобы кнопка росла вместе с текстом */
+    padding: 1rem 2rem;
+    border-radius: 0.5rem; /* Скругление 8px при 16px базовых */
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    /* Заставляем кнопки занимать одинаковое пространство на мобильных */
+    flex: 1 1 auto;
+    min-width: 160px;
+}
+
+/* Размер иконок внутри кнопок теперь тоже зависит от размера текста */
+.btn .icon {
+    width: 1.15em;
+    height: 1.15em;
+    flex-shrink: 0;
+}
+
+/* --- СТИЛИ ДЛЯ СИНЕЙ КНОПКИ --- */
+.btn-primary {
+    background: #1A56DB;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #1546b3;
+}
+
+.btn-primary:active {
+    background: #0d2d73;
+    transform: scale(0.98); /* Эффект физического нажатия (слегка уменьшается) */
+}
+
+/* --- СТИЛИ ДЛЯ СВЕТЛОЙ КНОПКИ --- */
+.btn-secondary {
+    background: rgba(243, 244, 246, 0.6);
+    color: #111827;
+    border: 1px solid #D1D5DB;
+    backdrop-filter: blur(4px); /* Легкое размытие заднего фона, как на макете */
+}
+
+.btn-secondary:hover {
+    background: rgba(230, 233, 240, 0.8);
+}
+
+.btn-secondary:active {
+    background: rgba(179, 204, 255, 0.5);
+    transform: scale(0.98);
+}
+.heroplacedes {
+    background-color: #DBEAFE;
+    border-radius: 30px;
+}
+.contactspace {
+    width: 30%;
+    vertical-align: baseline;
+    background-color: #DBEAFE;
+    border-radius: 30px;
+    padding: 40px;
+    border: 1px solid #BFDBFE;
+}
+.contactheader {
+    font-size: 42px;
+    color: #1E3A8A;
+}
+.contacttext {
+    font-size: 20px;
+    color: #475569;
+    padding-bottom: 10%;
+}
+.servicesheader {
+    text-align: center;
+    font-size: 42px;
+}
+.servicesplace {
+    background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+}
+/* Интерактивная карточка услуги */
+.service-card {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 40px 30px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+    /* Эффект при наведении на карточку */
+.service-card:hover {
+    transform: translateY(-8px);
+    background: #ffffff;
+    border-color: #1A56DB;
+    box-shadow: 0 20px 25px -5px rgba(26, 86, 219, 0.1), 0 10px 10px -5px rgba(26, 86, 219, 0.04);
+}
+/* Иконки */
+.card-icon {
+    width: 56px;
+    height: 56px;
+    background: #F3F4F6;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    transition: background 0.3s;
+}
+.card-icon svg {
+    width: 28px;
+    height: 28px;
+}
+.service-card:hover .card-icon {
+    background: rgba(26, 86, 219, 0.1);
+}
+.crdplace {
+    width: 33.3%;
+}
+/* СТИЛИ ДЛЯ ИНТЕГРАЦИИ И ВЫРАВНИВАНИЯ С СЕКЦИЕЙ УСЛУГ */
+
+/* Контейнер ячейки для двух элементов (делят строку 50% на 50% с учетом отступов) */
+.methodology-crdplace {
+    width: 50%;
+    padding: 15px; /* Стандартный отступ между карточками в строке */
+    vertical-align: top;
+}
+
+/* Декоративные цветные линии на верхнем краю карточки */
+.methodology-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+}
+
+    .methodology-line.blue-line {
+        background-color: #1A56DB;
+    }
+
+    .methodology-line.purple-line {
+        background-color: #7C3AED;
+    }
+
+/* Стили заголовков внутри карточек аналогично услугам */
+.service-card h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 6px;
+}
+
+/* Текстовые подписи к типам методологий */
+.methodology-type-badge {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: rgba(26, 86, 219, 0.08);
+    color: #1A56DB;
+    display: inline-block;
+    margin-bottom: 16px;
+    align-self: flex-start;
+}
+
+    .methodology-type-badge.purple-badge {
+        background: rgba(124, 58, 237, 0.08);
+        color: #7C3AED;
+    }
+
+/* Описание внутри карточки */
+.service-card p {
+    font-size: 15px;
+    color: #4B5563;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+/* Нижняя информационная плашка рекомендации */
+.methodology-card-footer {
+    background: #F9FAFB;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #F3F4F6;
+    margin-top: auto; /* Автоматически прижимает блок к низу карточки при разной высоте текста */
+}
+
+    .methodology-card-footer .footer-label {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #6B7280;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .methodology-card-footer p {
+        font-size: 14px;
+        color: #374151;
+        margin-bottom: 0;
+        line-height: 1.4;
+    }
+
+/* Адаптивный перенос карточек на мобильных устройствах */
+@media (max-width: 768px) {
+    .methodology-crdplace {
+        display: block;
+        width: 100% !important;
+        padding: 10px 0;
+    }
+
+        .methodology-crdplace:first-child {
+            padding-top: 20px;
+        }
+    /* ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ОФОРМЛЕНИЯ ВНУТРЕННИХ ЭЛЕМЕНТОВ ПОРТФОЛИО */
+
+    /* Декоративные цветные линии на верхнем крае карточки */
+    .portfolio-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+    }
+
+        .portfolio-line.blue-line {
+            background-color: #2563EB;
+        }
+
+        .portfolio-line.purple-line {
+            background-color: #7C3AED;
+        }
+
+        .portfolio-line.green-line {
+            background-color: #10B981;
+        }
+
+    /* Блок превью проекта (имитация изображения/интерфейса) */
+    .portfolio-preview {
+        width: 100%;
+        height: 150px;
+        background-color: #F3F4F6;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #E5E7EB;
+        overflow: hidden;
+    }
+
+    .preview-placeholder {
+        font-size: 14px;
+        font-weight: 600;
+        color: #9CA3AF;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    /* Бейджи типов проектов поверх превью */
+    .portfolio-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+        background-color: #DBEAFE;
+        color: #1E3A8A;
+    }
+
+        .portfolio-badge.purple-badge {
+            background-color: #F3E8FF;
+            color: #6B21A8;
+        }
+
+        .portfolio-badge.green-badge {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+
+    /* Заголовки и описания */
+    .portfolio-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+        line-height: 1.3;
+    }
+
+    .portfolio-desc {
+        font-size: 14px;
+        color: #4B5563;
+        line-height: 1.5;
+        margin-bottom: 20px;
+        flex-grow: 1; /* Выталкивает мета-информацию вниз при разной длине текста */
+    }
+
+    /* Блок характеристик проекта (Стек, Срок, Методология) */
+    .portfolio-meta {
+        background-color: #F9FAFB;
+        border: 1px solid #F3F4F6;
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 24px;
+    }
+
+    .meta-item {
+        font-size: 13px;
+        color: #374151;
+        margin-bottom: 6px;
+        line-height: 1.4;
+    }
+
+        .meta-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .meta-item strong {
+            color: #111827;
+            font-weight: 600;
+        }
+
+    /* Интерактивная кнопка-ссылка "Подробнее" */
+    .portfolio-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2563EB;
+        text-decoration: none;
+        transition: color 0.2s ease-in-out;
+        margin-top: auto; /* Прижимает кнопку строго к низу карточки */
+    }
+
+        .portfolio-link:hover {
+            color: #1D4ED8;
+        }
+
+    /* Поведение элементов при наведении на .service-card */
+    .service-card:hover .portfolio-preview {
+        border-color: rgba(37, 99, 235, 0.2);
+        background-color: #EBF5FF;
+    }
+
+    .service-card:hover .preview-placeholder {
+        color: #2563EB;
+    }
+
+    /* Адаптивность для мобильных экранов */
+    @media (max-width: 992px) {
+        .crdplace {
+            display: block;
+            width: 100% !important;
+            padding: 15px 0 !important;
+        }
+    }
+
+    .login-link {
+        padding: 10px 18px;
+        border: 1px solid #E5E7EB;
+        border-radius: 10px;
+        background-color: #ffffff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease-in-out;
+    }
+
+        .login-link:hover {
+            border-color: #2563EB;
+            background-color: #EFF6FF;
+            transform: translateY(-1px);
+        }
+
+    /* Декоративные цветные линии на верхнем крае карточки */
+    .reviews-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+    }
+
+        .reviews-line.blue-line {
+            background-color: #2563EB;
+        }
+
+        .reviews-line.purple-line {
+            background-color: #7C3AED;
+        }
+
+        .reviews-line.green-line {
+            background-color: #10B981;
+        }
+
+    /* Рейтинг (Звездочки) */
+    .reviews-rating {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 20px;
+    }
+
+        .reviews-rating span {
+            color: #FBBF24;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+            /* Последняя серая звезда для третьего отзыва */
+            .reviews-rating span:nth-child(5) {
+                color: #E5E7EB;
+            }
+
+    /* Текст отзыва */
+    .reviews-text {
+        font-size: 15px;
+        color: #4B5563;
+        line-height: 1.6;
+        font-style: italic;
+        margin-bottom: 24px;
+        var-grow: 1;
+        flex-grow: 1;
+    }
+
+    /* Блок информации об авторе */
+    .reviews-author-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-top: 1px solid #F3F4F6;
+        padding-top: 16px;
+        margin-top: auto;
+    }
+
+    .author-avatar {
+        width: 44px;
+        height: 44px;
+        background-color: #EFF6FF;
+        color: #2563EB;
+        font-weight: 700;
+        font-size: 14px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border: 1px solid #BFDBFE;
+    }
+
+    /* Имя клиента */
+    .author-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: #111827;
+        margin: 0 0 2px 0;
+    }
+
+    /* Компания */
+    .author-company {
+        font-size: 13px;
+        color: #6B7280;
+        display: block;
+    }
+
+    /* Адаптивный перенос карточек на мобильных экранах */
+    @media (max-width: 992px) {
+        .crdplace {
+            display: block;
+            width: 100% !important;
+            padding: 15px 0 !important;
+        }
+    }
+    /* 1. Жестко фиксируем адаптивную высоту всей секции пустого состояния на 25% от экрана (вместо стандартных 60%+) */
+    .responsive-empty-container,
+    .responsive-empty-table,
+    .responsive-empty-table td {
+        height: 25vh !important;
+        min-height: 160px !important;
+        max-height: 260px !important;
+        box-sizing: border-box !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .responsive-empty-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        table-layout: fixed !important;
+    }
+
+    /* 2. Делаем саму карточку резиновой, но компактной */
+    .service-card.review-empty-state-responsive {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        /* Занимает 22% от высоты экрана, подстраиваясь под ресайз */
+        height: 22vh !important;
+        min-height: 150px !important;
+        max-height: 240px !important;
+        width: 85% !important;
+        max-width: 500px !important;
+        margin: 0 auto !important;
+        padding: 1.5vh 2vw !important; /* Отступы зависят от размеров окна */
+
+        background: rgba(255, 255, 255, 0.98) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04) !important;
+    }
+
+        /* Отключаем любые трансформации при ховере, чтобы не ломать структуру */
+        .service-card.review-empty-state-responsive:hover {
+            transform: none !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04) !important;
+        }
+
+    .reviews-line.empty-line {
+        background-color: #9CA3AF !important;
+    }
+
+    /* 3. Адаптивная мини-иконка */
+    .empty-icon-wrapper-responsive {
+        width: 4vh !important;
+        height: 4vh !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+        background-color: #F9FAFB !important;
+        border: 1px dashed #D1D5DB !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-bottom: 0.8vh !important;
+    }
+
+        .empty-icon-wrapper-responsive svg {
+            width: 2vh !important;
+            height: 2vh !important;
+            min-width: 16px !important;
+            min-height: 16px !important;
+        }
+
+    /* 4. Адаптивные шрифты через функцию clamp() — не станут гигантскими или слишком мелкими */
+    .empty-title-responsive {
+        font-size: clamp(14px, 1.8vh, 18px) !important;
+        font-weight: 700 !important;
+        color: #1F2937 !important;
+        margin: 0 0 0.4vh 0 !important;
+    }
+
+    .empty-description-responsive {
+        font-size: clamp(11px, 1.4vh, 13.5px) !important;
+        color: #4B5563 !important;
+        max-width: 420px !important;
+        line-height: 1.35 !important;
+        margin: 0 0 1vh 0 !important;
+    }
+
+    /* 5. Резиновая кнопка */
+    .empty-cta-btn-responsive {
+        padding: 0.6vh 1.5vw !important;
+        font-size: clamp(11px, 1.4vh, 13px) !important;
+        height: auto !important;
+        min-height: auto !important;
+        width: auto !important;
+    }
