@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Wangkanai.Detection" Version="7.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OrderFlow.Application\OrderFlow.Application.csproj" />
   </ItemGroup>
 

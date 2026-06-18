@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
 
-     <link rel="stylesheet" href="~/Scripts/CSS/Background.css" />
+    <link rel="stylesheet" href="~/Scripts/CSS/BackgroundMobile.css" />
 </head>
-<body>
+<body id="bdy">
     <div id="screenSpace" class="workspace">
-        <div id="header" class="headers" style="border: 1px solid black">
+        <div id="header" class="headers" style="border: 1px solid black; align-content:center;">
             <span class="headertext">@Model.Header</span>
         </div>
         @RenderBody()
@@ -19,11 +19,7 @@
     <script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
 
     <script type="text/javascript">
-        $(document).ready(function () {
-        $("#screenSpace").css("height", getHeightInPx(97));
-        $("#screenSpace").css("width", getWidthInPx(97));
-        $("#header").css("height", getHeightInPx(5));
-        });
+        $("#bdy").css("width", getWidthInPx(100));
     </script>
 </body>
 </html>

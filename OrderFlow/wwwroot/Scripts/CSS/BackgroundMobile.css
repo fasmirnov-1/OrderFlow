@@ -1,0 +1,299 @@
+﻿/* ==========================================================================
+   БАЗОВЫЕ СТИЛИ СТРАНИЦЫ (ИСКЛЮЧИТЕЛЬНО МОБИЛЬНЫЙ ИНТЕРФЕЙС)
+   ========================================================================== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #f9fafb;
+}
+
+/* Принудительный перевод всех табличных элементов в блочные */
+.workspace,
+table#area,
+table#area > tbody,
+table#area > tbody > tr,
+table#area > tbody > tr > td {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    box-sizing: border-box;
+}
+
+/* Первый экран: убираем padding по бокам, чтобы картинка встала вплотную к краям экрана */
+#section-1 {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.heroplace {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important; /* Убрали боковые отступы для растягивания баннера */
+    margin: 0 !important;
+}
+.contactspace {
+    display: block !important;
+    width: 100% !important;
+    padding: 12px !important;
+    box-sizing: border-box;
+}
+
+/* Контейнер для Hero-изображения */
+#hro {
+    position: relative;
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Растягиваем картинку на 100% ширины вьюпорта */
+#hroimg {
+    width: 100vw !important; /* Растягивает строго на всю ширину экрана */
+    height: auto !important;
+    max-height: 60vh !important; /* Ограничиваем по высоте, чтобы не занимала весь экран по вертикали */
+    object-fit: cover;
+    display: block;
+    border-radius: 0; /* Убираем скругления, так как картинка теперь идет в край */
+}
+
+/* Действия (кнопки) на баннере — добавляем им отступ, так как у родителя padding теперь 0 */
+.hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+    width: 100%;
+    padding: 0 12px; /* Добавили отступы кнопкам, чтобы они не липли к краям экрана */
+    box-sizing: border-box;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-primary {
+    background-color: #2563eb;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* Заголовки разделов */
+.servicesheader {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    color: #111827;
+    padding: 0 12px;
+}
+
+/* Сетки блоков (Услуги, Методологии, Портфолио, Отзывы) */
+#section-2 table.workspace tr,
+table.workspace tbody tr,
+table tbody tr {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+}
+
+.methodology-crdplace, .crdplace {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 12px !important;
+    box-sizing: border-box;
+}
+
+/* Универсальная карточка */
+.service-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+    .service-card h3 {
+        margin-top: 8px;
+        margin-bottom: 10px;
+        font-size: 18px;
+        color: #111827;
+    }
+
+    .service-card p {
+        color: #4b5563;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+/* Декоративные линии */
+.methodology-line, .portfolio-line, .reviews-line {
+    /*position: absolute;*/
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    border-radius: 12px 12px 0 0;
+}
+
+.blue-line {
+    background-color: #1A56DB;
+}
+
+.purple-line {
+    background-color: #7C3AED;
+}
+
+/* Иконки в карточках */
+.card-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+/* Индикаторы (Бейджи) */
+.methodology-type-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #EBF5FF;
+    color: #1E429F;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.purple-badge {
+    background: #F3E8FF;
+    color: #6B21A8;
+}
+
+.methodology-card-footer {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #f3f4f6;
+    font-size: 13px;
+}
+
+    .methodology-card-footer span {
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .methodology-card-footer p {
+        margin: 2px 0 0 0;
+        color: #6b7280;
+    }
+
+/* Ссылки */
+.portfolio-link {
+    color: #2563eb;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Отзывы */
+.reviews-rating {
+    color: #FBBF24;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.reviews-text {
+    font-style: italic;
+    color: #374151;
+    font-size: 14px;
+}
+
+.reviews-author-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.author-avatar {
+    width: 36px;
+    height: 36px;
+    background: #EFF6FF;
+    color: #2563eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+/* Карточки контактов */
+.contacts-mobile-wrapper {
+    padding: 10px 0;
+}
+
+.mobile-contact-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contact-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+}
+
+    .contact-label img {
+        width: 20px;
+        height: 20px;
+    }
+
+.contact-value {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+}
