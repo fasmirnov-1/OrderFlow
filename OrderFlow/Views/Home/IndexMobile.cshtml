@@ -5,6 +5,7 @@
 @using Wangkanai.Detection.Models;
 
 @inject Wangkanai.Detection.Services.IDetectionService DetectionService
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @model OrderFlow.Domain.Page;
 @{
@@ -26,24 +27,26 @@
                         <picture class="hero-picture-container">
                             <source media="(max-width: 667px) and (orientation: landscape)" srcset="/img/HeroImage.png">
                             <source media="(max-width: 768px) and (orientation: portrait)" srcset="/img/HeroImageMobile.png">
-                            <img src="/img/HeroImage.png" alt="ПО для бизнеса" class="hero-responsive-img" />
+                            <img style="width: 100%;" id="pctrue" src="/img/HeroImage.png" alt="ПО для бизнеса" class="hero-responsive-img" />
                         </picture>
 
-                        <div class="hero-actions">
-                            <button class="btn btn-primary">
-                                <span>Заказать проект</span>
-                                <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
+                        <form asp-controller="PageInDevelopment" asp-action="Index">
+                            <div class="hero-actions">
+                                <button class="btn btn-primary">
+                                    <span>Заказать проект</span>
+                                    <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
 
-                            <button class="btn btn-secondary">
-                                <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4 2.5V13.5L13 8L4 2.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
-                                </svg>
-                                <span>Смотреть кейсы</span>
-                            </button>
-                        </div>
+                                <button class="btn btn-secondary">
+                                    <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4 2.5V13.5L13 8L4 2.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                                    </svg>
+                                    <span>Смотреть кейсы</span>
+                                </button>
+                            </div>
+                        </form>
                     </td>
                 </tr>
             </table>
@@ -196,7 +199,7 @@
                                         <div style="font-size:14px; color:#374151;">
                                             <strong>Методология:</strong> @portfolio.Metodology.Mtdology.Value.ToRussian()
                                         </div>
-                                        <a href="#" class="portfolio-link">
+                                        <a href="/PageInDevelopment/Index" class="portfolio-link">
                                             <span>Подробнее о кейсе</span>
                                             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1.1em; height: 1.1em;">
                                                 <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -326,13 +329,3 @@
 
 <script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
 <script type="text/javascript" src="~/Scripts/Background_v1.js"></script>
-
-<script type="text/javascript">
-    $("#srvces").css("width", getWidthInPx(100));
-    $("#mdtlgy").css("width", getWidthInPx(100));
-    $("#prtflio").css("width", getWidthInPx(100));
-    $("#fdbck").css("width", getWidthInPx(100));
-    $("#srvcesPlaces").css("width", getWidthInPx(100));
-    $("#crdPalc").css("width", getWidthInPx(100));
-    $("#cdr").css("width", getWidthInPx(98));
-</script>

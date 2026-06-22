@@ -21,6 +21,11 @@ namespace OrderFlow.Controllers
         }
         public IActionResult Index()
         {
+            if (_detectionService.Device.Type == Device.Tablet)
+            {
+                return RedirectToAction("Index", "PageInDevelopment");
+            }
+
             if (_detectionService.Device.Type == Device.Mobile)
             {
                 return RedirectToAction("IndexMobile", "Home");
@@ -92,6 +97,16 @@ namespace OrderFlow.Controllers
         }
         public IActionResult IndexMobile()
         {
+            if (_detectionService.Device.Type == Device.Tablet)
+            {
+                return RedirectToAction("Index", "PageInDevelopment");
+            }
+
+            if (_detectionService.Device.Type == Device.Desktop)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             Page page = new Page();
 
             page.Header = "Создание приложений на заказ...";

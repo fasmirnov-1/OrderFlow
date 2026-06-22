@@ -4,11 +4,25 @@
 @using OrderFlow.Application.Extensions;
 @using Wangkanai.Detection.Models;
 
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 @inject Wangkanai.Detection.Services.IDetectionService DetectionService
 
 @model OrderFlow.Domain.Page;
 @{
     Layout = "~/Views/Shared/_Background.cshtml";
+
+    // Заголовок вкладки (Title) — здесь используется главная коммерческая фраза
+    ViewData["Title"] = "Создание приложений на заказ и автоматизация бизнеса";
+    
+    // Описание (Description) — формирует сниппет в результатах поиска. Сюда отлично встали остальные фразы
+    ViewData["MetaDescription"] = "OrderFlow — ваш программист в мире автоматизации. Мы осуществляем создание приложений на заказ любой сложности. Удобные, надежные и доступные программы для всех сфер бизнеса.";
+    
+    // Ключевые слова (Keywords) — для точного вхождения фраз для поисковых систем
+    ViewData["MetaKeywords"] = "создание приложений на заказ, программы для всех, ваш программист, orderflow, разработка по, автоматизация процессов";
+    
+    // Канонический адрес вашей страницы
+    ViewData["CanonicalUrl"] = "https://createsoft.orderflow.abrdns.com/";
 
     Contacts contacts = Model.Children[Types.Contacts];
     List<Services> services = Model.Children[Types.Services];
@@ -28,19 +42,21 @@
                     <td id="hro" class="heroplacedes">
                         <div class="hero-content-wrapper">
                             <div class="hero-actions">
-                                <button class="btn btn-primary">
-                                    <span>Заказать проект</span>
-                                    <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </button>
+                                <form asp-controller="PageInDevelopment" asp-action="Index">
+                                    <button class="btn btn-primary">
+                                        <span>Заказать проект</span>
+                                        <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </button>
 
-                                <button class="btn btn-secondary">
-                                    <svg class="icon icon-play" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M4 2.5V13.5L13 8L4 2.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
-                                    </svg>
-                                    <span>Смотреть кейсы</span>
-                                </button>
+                                    <button class="btn btn-secondary">
+                                        <svg class="icon icon-play" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M4 2.5V13.5L13 8L4 2.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                                        </svg>
+                                        <span>Смотреть кейсы</span>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         <div class="hero-overlay"></div>
@@ -191,7 +207,7 @@
                                             <div class="portfolio-meta">
                                                 <div class="meta-item"><strong>Методология: </strong>@portfolio.Metodology.Mtdology.Value.ToRussian()</div>
                                             </div>
-                                            <a href="#" class="portfolio-link">
+                                            <a class="portfolio-link" href="/PageInDevelopment/Index">
                                                 <span>Подробнее о кейсе</span>
                                                 <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1.1em; height: 1.1em;">
                                                     <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -212,12 +228,12 @@
             <div class="workspace">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
                     <div class="servicesheader" style="text-align: left; margin: 0;">Отзывы наших клиентов</div>
-                    <a href="#" class="portfolio-link login-link">
+                    <a asp-controller="PageInDevelopment" asp-action="Index" class="portfolio-link login-link">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.2em; height: 1.2em;">
                             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
                         </svg>
                         <span>Вход в панель</span>
-                    </a>
+                     </a>
                 </div>
                 <table class="workspace">
                     @if (feedbacks != null && feedbacks.Count > 0)
