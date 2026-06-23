@@ -21,9 +21,24 @@ namespace OrderFlow.Controllers
         }
         public IActionResult Index()
         {
-            if (_detectionService.Device.Type == Device.Tablet)
+            var isMobileHint = Request.Headers["Sec-CH-UA-Mobile"].ToString();
+            var uaHeader = Request.Headers["User-Agent"].ToString();
+
+            bool isTablet = false;
+
+            if (isMobileHint == "?0" && uaHeader.Contains("Android", StringComparison.OrdinalIgnoreCase))
             {
-                return RedirectToAction("Index", "PageInDevelopment");
+                isTablet = true;
+            }
+
+            if (uaHeader.Contains("iPad", StringComparison.OrdinalIgnoreCase))
+            {
+                isTablet = true;
+            }
+
+            if (isTablet)
+            {
+                return RedirectToAction("IndexMobile", "Home");
             }
 
             if (_detectionService.Device.Type == Device.Mobile)
@@ -97,16 +112,6 @@ namespace OrderFlow.Controllers
         }
         public IActionResult IndexMobile()
         {
-            if (_detectionService.Device.Type == Device.Tablet)
-            {
-                return RedirectToAction("Index", "PageInDevelopment");
-            }
-
-            if (_detectionService.Device.Type == Device.Desktop)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
             Page page = new Page();
 
             page.Header = "Создание приложений на заказ...";

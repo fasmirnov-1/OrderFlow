@@ -107,10 +107,12 @@
                     }
                     else
                     {
+                        int i = 0;
                         foreach (Services serviceItem in services)
                         {
-                            <td id="crdPalc" class="crdplace">
-                                <div id="crd" class="service-card">
+                            i = i + 1;
+                            <td id="crdPalc_@i" class="crdplace">
+                                <div id="crd_@i" class="service-card">
                                     <div class="methodology-line blue-line"></div>
                                     <h3>@serviceItem.Name</h3>
                                     <p>@serviceItem.Description</p>
@@ -176,7 +178,7 @@
             <div class="servicesheader">Наши проекты (Портфолио)</div>
             <table class="workspace">
                 <tbody>
-                    <tr>
+                    <tr id="prtflio">
                         @if (portfolios == null || portfolios.Count == 0)
                         {
                             <td class="crdplace">
@@ -329,3 +331,20 @@
 
 <script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
 <script type="text/javascript" src="~/Scripts/Background_v1.js"></script>
+
+<script type="text/javascript">
+    $("#prtflio").css("width", getWidthInPx(100));
+    $("#srvces").css("width", getWidthInPx(100));
+    $("#mdtlgy").css("width", getWidthInPx(100));
+    $("#cdr").css("width", getWidthInPx(100));
+    
+    $(document).ready(function() {
+    $('#srvcesPlaces').find('td').each(function(index, element) {
+        $(this).css("width", getWidthInPx(100));
+        });
+    });
+
+    $("#srvcesPlaces").css("width", getWidthInPx(100));
+    $("#prtflio").css("width", getWidthInPx(99));
+    $("#fdbck").css("width", getWidthInPx(99));
+</script>
