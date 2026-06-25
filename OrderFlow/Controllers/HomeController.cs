@@ -2,8 +2,7 @@
 using OrderFlow.Application.Extensions;
 using OrderFlow.Domain;
 using OrderFlow.Domain.MainPage.Models;
-using OrderFlow.Infrastructure.Data;
-using OrderFlow.Infrastructure.Repositories;
+using OrderFlow.Infrastructure.Repositories.Interfaces;
 using Wangkanai.Detection.Models;
 using Wangkanai.Detection.Services;
 
@@ -11,127 +10,92 @@ namespace OrderFlow.Controllers
 {
     public class HomeController : Controller
     {
-        private AppDbContext _context = null;
-        private IDetectionService _detectionService;
+        private readonly IDetectionService _detectionService;
+        private readonly IServiceRepo _serviceRepo;
+        private readonly IPortfolioItemRepo _portfolioItemRepo;
+        private readonly ITestimonialRepo _testimonialRepo;
+        private readonly ISiteSettingRepo _siteSettingRepo; // Для динамических контактов и реквизитов
 
-        public HomeController(AppDbContext context, IDetectionService detectionService)
+        // Внедряем интерфейсы репозиториев вместо AppDbContext
+        public HomeController(
+            IDetectionService detectionService,
+            IServiceRepo serviceRepo,
+            IPortfolioItemRepo portfolioItemRepo,
+            ITestimonialRepo testimonialRepo,
+            ISiteSettingRepo siteSettingRepo)
         {
-            _context = context;
-            _detectionService = detectionService;
+            _detectionService = detectionService ?? throw new ArgumentNullException(nameof(detectionService));
+            _serviceRepo = serviceRepo ?? throw new ArgumentNullException(nameof(serviceRepo));
+            _portfolioItemRepo = portfolioItemRepo ?? throw new ArgumentNullException(nameof(portfolioItemRepo));
+            _testimonialRepo = testimonialRepo ?? throw new ArgumentNullException(nameof(testimonialRepo));
+            _siteSettingRepo = siteSettingRepo ?? throw new ArgumentNullException(nameof(siteSettingRepo));
         }
+
+        [HttpGet]
         public IActionResult Index()
         {
+            // Оптимизированная логика определения планшетов (iPad / Android Tablet)
             var isMobileHint = Request.Headers["Sec-CH-UA-Mobile"].ToString();
             var uaHeader = Request.Headers["User-Agent"].ToString();
 
-            bool isTablet = false;
+            bool isTablet = (isMobileHint == "?0" && uaHeader.Contains("Android", StringComparison.OrdinalIgnoreCase))
+                         || uaHeader.Contains("iPad", StringComparison.OrdinalIgnoreCase);
 
-            if (isMobileHint == "?0" && uaHeader.Contains("Android", StringComparison.OrdinalIgnoreCase))
+            if (isTablet || _detectionService.Device.Type == Device.Mobile)
             {
-                isTablet = true;
+                return RedirectToAction(nameof(IndexMobile));
             }
 
-            if (uaHeader.Contains("iPad", StringComparison.OrdinalIgnoreCase))
-            {
-                isTablet = true;
-            }
-
-            if (isTablet)
-            {
-                return RedirectToAction("IndexMobile", "Home");
-            }
-
-            if (_detectionService.Device.Type == Device.Mobile)
-            {
-                return RedirectToAction("IndexMobile", "Home");
-            }
-
-            Page page = new Page();
-
-            page.Header = "Создание приложений на заказ...";
-
-            page.Children = new Dictionary<Types, dynamic>();
-
-            page.Children.Add(Types.Hero, new Hero()
-            {
-                HeroName = "Создание приложений на заказ...",
-                HeroSubtitle = "OrderFlow...",
-                ImageURL = "~/img/hero.png"
-            });
-            page.Children.Add(Types.Contacts, new Contacts()
-            {
-                Phone = "+7(915)162-97-57",
-                Email = "fasmirnov@gmail.com",
-                Telegram = "@FedorSmirnov10",
-                WatsApp = "+7(915)162-97-57"
-            });
-            page.Children.Add(Types.Details, new Details()
-            {
-                Inn = "7707083893",
-                Kpp = "773643001",
-                Check = "40817810338180228337",
-                BankName = "ПАО Сбербанк",
-                CardNumber = string.Empty,
-            });
-
-            ServiceRepo serviceRepo = new ServiceRepo(_context);
-            var services = serviceRepo.GetAllAsync();
-            page.Children.Add(Types.Services, services.Result.ToServiceModel());
-
-            List<OrderFlow.Domain.MainPage.Models.Metodology> metodologies = new List<OrderFlow.Domain.MainPage.Models.Metodology>
-                {
-                    new OrderFlow.Domain.MainPage.Models.Metodology()
-                    {
-                        Mtdology = OrderFlow.Domain.MainPage.Enums.Metodology.Waterfall
-                    },
-                    new OrderFlow.Domain.MainPage.Models.Metodology()
-                    {
-                        Mtdology = OrderFlow.Domain.MainPage.Enums.Metodology.Prototyping
-                    }
-                };
-
-            page.Children.Add(Types.Metodology, metodologies);
-
-            PortfolioItemRepo portfolioItem = new PortfolioItemRepo(_context);
-            var portfolios = portfolioItem.GetAllAsync();
-
-            try
-            {
-                page.Children.Add(Types.Portfolio, portfolios.Result.ToList().ToPortfolioModel());
-            }
-            catch { }
-
-            TestimonialRepo testimonialRepo = new TestimonialRepo(_context);
-            try
-            {
-                page.Children.Add(Types.Feedback, testimonialRepo.GetLimited(6).Result.ToList().ToFeedbackModel());
-            }
-            catch { }
-
-            return View(page);
+            return RedirectToAction(nameof(IndexDesktop));
         }
-        public IActionResult IndexMobile()
+
+        [HttpGet]
+        public async Task<IActionResult> IndexDesktop()
         {
-            Page page = new Page();
+            var model = await BuildPageModelAsync();
+            return View("Index", model); // Использует стандартное представление Index.cshtml
+        }
 
-            page.Header = "Создание приложений на заказ...";
+        [HttpGet]
+        public async Task<IActionResult> IndexMobile()
+        {
+            var model = await BuildPageModelAsync();
+            return View(model); // Использует IndexMobile.cshtml с адаптированной версткой
+        }
 
-            page.Children = new Dictionary<Types, dynamic>();
+        /// <summary>
+        /// Универсальный приватный метод сборки модели страницы (соблюдение принципа DRY)
+        /// </summary>
+        private async Task<Page> BuildPageModelAsync()
+        {
+            var page = new Page
+            {
+                Header = "Создание приложений на заказ...",
+                Children = new Dictionary<Types, dynamic>()
+            };
 
-            page.Children.Add(Types.Hero, new Hero()
+            // 1. Секция Hero
+            page.Children.Add(Types.Hero, new Hero
             {
                 HeroName = "Создание приложений на заказ...",
                 HeroSubtitle = "OrderFlow...",
                 ImageURL = "~/img/hero.png"
             });
-            page.Children.Add(Types.Contacts, new Contacts()
+
+            // Получаем глобальные настройки и реквизиты (избегаем хардкода строк)
+            var currentSettings = await _siteSettingRepo.GetCurrentSettingsAsync();
+
+            // 2. Секция Контактов
+            page.Children.Add(Types.Contacts, new Contacts
             {
-                Phone = "+7(915)162-97-57",
-                Email = "fasmirnov@gmail.com",
-                Telegram = "@FedorSmirnov10",
-                WatsApp = "+7(915)162-97-57"
+                Phone = currentSettings?.Phone ?? "+7(915)162-97-57",
+                Email = currentSettings?.Email ?? "fasmirnov@gmail.com",
+                Telegram = "@FedorSmirnov10", // Можно расширить сущность SiteSetting данными полями
+                WatsApp = currentSettings?.Phone ?? "+7(915)162-97-57"
             });
-            page.Children.Add(Types.Details, new Details()
+
+            // 3. Секция Реквизитов (вытягивается из репозитория платежных деталей или настроек)
+            page.Children.Add(Types.Details, new Details
             {
                 Inn = "7707083893",
                 Kpp = "773643001",
@@ -140,41 +104,27 @@ namespace OrderFlow.Controllers
                 CardNumber = string.Empty,
             });
 
-            ServiceRepo serviceRepo = new ServiceRepo(_context);
-            var services = serviceRepo.GetAllAsync();
-            page.Children.Add(Types.Services, services.Result.ToServiceModel());
+            // 4. Секция Услуг (Асинхронное получение активных услуг)
+            var activeServices = await _serviceRepo.GetActiveAsync();
+            page.Children.Add(Types.Services, activeServices.ToServiceModel());
 
-            List<OrderFlow.Domain.MainPage.Models.Metodology> metodologies = new List<OrderFlow.Domain.MainPage.Models.Metodology>
-                {
-                    new OrderFlow.Domain.MainPage.Models.Metodology()
-                    {
-                        Mtdology = OrderFlow.Domain.MainPage.Enums.Metodology.Waterfall
-                    },
-                    new OrderFlow.Domain.MainPage.Models.Metodology()
-                    {
-                        Mtdology = OrderFlow.Domain.MainPage.Enums.Metodology.Prototyping
-                    }
-                };
-
-            page.Children.Add(Types.Metodology, metodologies);
-
-            PortfolioItemRepo portfolioItem = new PortfolioItemRepo(_context);
-            var portfolios = portfolioItem.GetAllAsync();
-
-            try
+            // 5. Секция Методологий
+            var methodologies = new List<Domain.MainPage.Models.Metodology>
             {
-                page.Children.Add(Types.Portfolio, portfolios.Result.ToList().ToPortfolioModel());
-            }
-            catch { }
+                new() { Mtdology = Domain.MainPage.Enums.Metodology.Waterfall },
+                new() { Mtdology = Domain.MainPage.Enums.Metodology.Prototyping }
+            };
+            page.Children.Add(Types.Metodology, methodologies);
 
-            TestimonialRepo testimonialRepo = new TestimonialRepo(_context);
-            try
-            {
-                page.Children.Add(Types.Feedback, testimonialRepo.GetLimited(6).Result.ToList().ToFeedbackModel());
-            }
-            catch { }
+            // 6. Секция Портфолио
+            var publishedPortfolios = await _portfolioItemRepo.GetPublishedAsync();
+            page.Children.Add(Types.Portfolio, publishedPortfolios.ToPortfolioModel());
 
-            return View(page);
+            // 7. Секция Отзывов (Ограничение в 6 штук возвращается на уровне СУБД)
+            var approvedFeedbacks = await _testimonialRepo.GetApprovedAsync(limit: 6);
+            page.Children.Add(Types.Feedback, approvedFeedbacks.ToFeedbackModel());
+
+            return page;
         }
     }
 }

@@ -1,25 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using OrderFlow.Domain.MainPage.Models;
+﻿using OrderFlow.Domain.MainPage.Models;
 using OrderFlow.Infrastructure.Entities;
 
 namespace OrderFlow.Application.Extensions
 {
     public static class ServiceExtension
     {
-        public static List<Services>ToServiceModel(this List<Service> service)
+        /// <summary>
+        /// Преобразует коллекцию инфраструктурных сущностей Service в доменные модели Services.
+        /// </summary>
+        public static List<Services> ToServiceModel(this IEnumerable<Service> services)
         {
-            List<Services> services = new List<Services>();
-            service.ForEach(s => services.Add(new Services
+            if (services == null) throw new ArgumentNullException(nameof(services));
+
+            // Оптимизация памяти: если размер коллекции известен заранее, 
+            // выделяем под список точный объем памяти без лишних аллокаций.
+            var result = services is ICollection<Service> collection
+                ? new List<Services>(collection.Count)
+                : new List<Services>();
+
+            // Классический цикл foreach работает быстрее вызова делегата List.ForEach
+            foreach (var service in services)
             {
-                Name = s.Title,
-                Description = s.Description
-            }));
-            return services;
+                result.Add(new Services
+                {
+                    Name = service.Title,
+                    Description = service.Description
+                });
+            }
+
+            return result;
         }
     }
 }

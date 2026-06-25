@@ -45,6 +45,15 @@
                                     </svg>
                                     <span>Смотреть кейсы</span>
                                 </button>
+
+                                <div class="login-blur-wrapper">
+                                    <a asp-controller="PageInDevelopment" asp-action="Index" class="btn-login-hero">
+                                        <svg class="icon icon-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
+                                        </svg>
+                                        <span>Логин</span>
+                                    </a>
+                                </div>
                             </div>
                         </form>
                     </td>
@@ -101,7 +110,7 @@
                     {
                         <td class="crdplace">
                             <div class="service-card" style="text-align: center; color: red;">
-                                Услуги не загружены...
+                                Services не загружены...
                             </div>
                         </td>
                     }
@@ -222,12 +231,12 @@
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
                 <div class="servicesheader" style="margin-bottom: 0;">Отзывы наших клиентов</div>
                 <div style="padding: 0 12px;">
-                    <a href="/PageInDevelopment/Index" class="portfolio-link login-link" style="margin: 0;">
+                    <!--<a href="/PageInDevelopment/Index" class="portfolio-link login-link" style="margin: 0;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.2em; height: 1.2em;">
                             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
                         </svg>
                         <span>Вход в панель</span>
-                    </a>
+                    </a>-->
                 </div>
             </div>
 
@@ -337,11 +346,11 @@
     $("#srvces").css("width", getWidthInPx(100));
     $("#mdtlgy").css("width", getWidthInPx(100));
     $("#cdr").css("width", getWidthInPx(100));
-    
+
     $(document).ready(function() {
     $('#srvcesPlaces').find('td').each(function(index, element) {
-        $(this).css("width", getWidthInPx(100));
-        });
+    $(this).css("width", getWidthInPx(100));
+    });
     });
 
     $("#srvcesPlaces").css("width", getWidthInPx(100));

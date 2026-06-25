@@ -376,3 +376,66 @@ html {
         background: linear-gradient(to right, rgba(255,255,255,0.95) 40%, rgba(255,255,255,0) 100%) !important;
     }
 }
+/* Базовые стили для кнопок в .hero-actions (если они не определены) */
+.hero-actions form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Контейнер-обертка для создания мягкого бесшовного размытия вокруг кнопки */
+.hero-actions .login-blur-wrapper {
+    display: inline-block;
+    position: relative;
+    padding: 20px 35px; /* Размер невидимой области, где происходит плавное исчезновение блюра */
+    margin: -20px -35px; /* Компенсируем паддинги, чтобы не сдвигать соседние кнопки */
+    vertical-align: middle;
+    border-radius: 50%;
+    /* Эффект размытия заднего плана */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* Маска, которая делает границы размытия абсолютно невидимыми (мягкое затухание от центра к краям) */
+    mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0) 70%);
+    -webkit-mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0) 70%);
+}
+
+/* Сама кнопка внутри области размытия */
+.btn-login-hero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff !important;
+    /* Делаем подложку кнопки чуть темнее и прозрачнее, так как за ней уже работает общий блюр */
+    background: rgba(17, 24, 39, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    position: relative;
+    z-index: 2; /* Кнопка всегда поверх размытия */
+}
+
+    /* Эффект при наведении */
+    .btn-login-hero:hover {
+        background: rgba(17, 24, 39, 0.7);
+        border-color: rgba(255, 255, 255, 0.7);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        transform: translateY(-1px);
+    }
+
+    .btn-login-hero:active {
+        transform: translateY(0);
+    }
+
+    .btn-login-hero .icon-login {
+        width: 1.2em;
+        height: 1.2em;
+        flex-shrink: 0;
+        stroke: #3b82f6;
+    }

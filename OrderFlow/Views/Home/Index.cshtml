@@ -14,13 +14,13 @@
 
     // Заголовок вкладки (Title) — здесь используется главная коммерческая фраза
     ViewData["Title"] = "Создание приложений на заказ и автоматизация бизнеса";
-    
+
     // Описание (Description) — формирует сниппет в результатах поиска. Сюда отлично встали остальные фразы
     ViewData["MetaDescription"] = "OrderFlow — ваш программист в мире автоматизации. Мы осуществляем создание приложений на заказ любой сложности. Удобные, надежные и доступные программы для всех сфер бизнеса.";
-    
+
     // Ключевые слова (Keywords) — для точного вхождения фраз для поисковых систем
     ViewData["MetaKeywords"] = "создание приложений на заказ, программы для всех, ваш программист, orderflow, разработка по, автоматизация процессов";
-    
+
     // Канонический адрес вашей страницы
     ViewData["CanonicalUrl"] = "https://createsoft.orderflow.abrdns.com/";
 
@@ -56,6 +56,15 @@
                                         </svg>
                                         <span>Смотреть кейсы</span>
                                     </button>
+
+                                    <div class="login-blur-wrapper">
+                                    <a asp-controller="PageInDevelopment" asp-action="Index" class="btn btn-login-hero">
+                                        <svg class="icon icon-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
+                                        </svg>
+                                        <span>Логин</span>
+                                    </a>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -228,12 +237,12 @@
             <div class="workspace">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
                     <div class="servicesheader" style="text-align: left; margin: 0;">Отзывы наших клиентов</div>
-                    <a asp-controller="PageInDevelopment" asp-action="Index" class="portfolio-link login-link">
+                    <!--<a asp-controller="PageInDevelopment" asp-action="Index" class="portfolio-link login-link">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.2em; height: 1.2em;">
                             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
                         </svg>
                         <span>Вход в панель</span>
-                     </a>
+                    </a>-->
                 </div>
                 <table class="workspace">
                     @if (feedbacks != null && feedbacks.Count > 0)
@@ -364,7 +373,7 @@
                         <div style="flex: 1; min-width: 160px; font-size: 13px; color: #6b7280;">Расчетный счет (Р/с)</div>
                         <div style="flex: 2; min-width: 220px; font-size: 14px; font-weight: 600; color: #2563eb; display: flex; align-items: center; justify-content: space-between;">
                             <span style="font-family: monospace; font-size: 15px; letter-spacing: 0.5px;">@details.Check</span>
-                            <button title="Копировать" onclick="navigator.clipboard.writeText('@details.Check')" style="background: none; border: none; cursor: pointer; color: #9ca3af; padding: 4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
+                            <button title="Копировать" onclick="navigator.clipboard.writeText('@details.Check')" style="background: none; border: none; cursor: pointer; color: #9ca3af; padding: 4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"></path></svg></button>
                         </div>
                     </div>
                     <div class="req-row" style="display: flex; flex-wrap: wrap; padding: 12px 0; align-items: center;">
