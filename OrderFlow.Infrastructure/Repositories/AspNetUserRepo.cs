@@ -15,16 +15,13 @@ namespace OrderFlow.Infrastructure.Repositories
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<AspNetUser> CreateAsync(AspNetUser user)
+        public async Task CreateAsync(AspNetUser user)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
+            // Обязательно дожидаемся проверки уникальности
+            await CheckUniqueConstraintsAsync(user, isUpdate: false);
 
-            // ПРОВЕРКА КОНСТРЕИНТОВ УНИКАЛЬНОСТИ (Превентивная валидация)
-            await CheckUniqueConstraintsAsync(user);
-
-            _context.AspNetUsers.Add(user);
+            await _context.AspNetUsers.AddAsync(user);
             await _context.SaveChangesAsync();
-            return user;
         }
 
         public async Task<AspNetUser?> GetByIdAsync(string id)
@@ -94,45 +91,75 @@ namespace OrderFlow.Infrastructure.Repositories
         /// </summary>
         private async Task CheckUniqueConstraintsAsync(AspNetUser user, bool isUpdate = false)
         {
-            if (!string.IsNullOrEmpty(user.UserName))
-            {
-                bool userNameExists = isUpdate
-                    ? await _context.AspNetUsers.AnyAsync(u => u.UserName == user.UserName && u.Id != user.Id)
-                    : await _context.AspNetUsers.AnyAsync(u => u.UserName == user.UserName);
+            // Вытягиваем флаги существования одним комбинированным запросом
+            var existingUser = await _context.AspNetUsers
+                .AsNoTracking()
+                .Where(u => !isUpdate || u.Id != user.Id)
+                .Select(u => new
+                {
+                    UserNameExists = u.UserName == user.UserName,
+                    NormalizedNameExists = u.NormalizedUserName == user.NormalizedUserName,
+                    EmailExists = u.Email == user.Email,
+                    NormalizedEmailExists = u.NormalizedEmail == user.NormalizedEmail
+                })
+                .FirstOrDefaultAsync(u => u.UserNameExists || u.NormalizedNameExists || u.EmailExists || u.NormalizedEmailExists);
 
-                if (userNameExists)
+            if (existingUser != null)
+            {
+                if (existingUser.UserNameExists && !string.IsNullOrEmpty(user.UserName))
                     throw new ArgumentException($"Нарушение Unique Constraint: Имя пользователя '{user.UserName}' уже занято.");
-            }
 
-            if (!string.IsNullOrEmpty(user.NormalizedUserName))
-            {
-                bool normalizedNameExists = isUpdate
-                    ? await _context.AspNetUsers.AnyAsync(u => u.NormalizedUserName == user.NormalizedUserName && u.Id != user.Id)
-                    : await _context.AspNetUsers.AnyAsync(u => u.NormalizedUserName == user.NormalizedUserName);
-
-                if (normalizedNameExists)
+                if (existingUser.NormalizedNameExists && !string.IsNullOrEmpty(user.NormalizedUserName))
                     throw new ArgumentException($"Нарушение Unique Constraint: Нормализованное имя пользователя '{user.NormalizedUserName}' уже существует.");
-            }
 
-            if (!string.IsNullOrEmpty(user.Email))
-            {
-                bool emailExists = isUpdate
-                    ? await _context.AspNetUsers.AnyAsync(u => u.Email == user.Email && u.Id != user.Id)
-                    : await _context.AspNetUsers.AnyAsync(u => u.Email == user.Email);
-
-                if (emailExists)
+                if (existingUser.EmailExists && !string.IsNullOrEmpty(user.Email))
                     throw new ArgumentException($"Нарушение Unique Constraint: Email '{user.Email}' уже зарегистрирован.");
-            }
 
-            if (!string.IsNullOrEmpty(user.NormalizedEmail))
-            {
-                bool normalizedEmailExists = isUpdate
-                    ? await _context.AspNetUsers.AnyAsync(u => u.NormalizedEmail == user.NormalizedEmail && u.Id != user.Id)
-                    : await _context.AspNetUsers.AnyAsync(u => u.NormalizedEmail == user.NormalizedEmail);
-
-                if (normalizedEmailExists)
+                if (existingUser.NormalizedEmailExists && !string.IsNullOrEmpty(user.NormalizedEmail))
                     throw new ArgumentException($"Нарушение Unique Constraint: Нормализованный Email '{user.NormalizedEmail}' уже зарегистрирован.");
             }
+        }
+        public async Task<bool> IsUserExists(string login)
+        {
+            // Исправлено: выбрасываем исключение, если строка ДЕЙСТВИТЕЛЬНО пустая или состоит из пробелов
+            if (string.IsNullOrWhiteSpace(login))
+            {
+                throw new ArgumentException("Логин не может быть пустым или состоять из пробелов.", nameof(login));
+            }
+
+            // Оптимизация: AnyAsync выполняет быстрый запрос в БД и возвращает true/false,
+            // вообще не загружая сущности AspNetUser в оперативную память приложения.
+            return await _context.AspNetUsers
+                .AnyAsync(u => u.UserName == login);
+        }
+        public async Task<string?> GetPasswordByLoginAsync(string login)
+        {
+            // 1. Валидация входных данных
+            if (string.IsNullOrWhiteSpace(login))
+            {
+                throw new ArgumentException("Логин не может быть пустым или состоять из пробелов.", nameof(login));
+            }
+
+            // 2. Проекция через .Select() вытаскивает из БД исключительно строку хэша пароля.
+            // Это генерирует оптимальный SQL-запрос вида: SELECT [u].[PasswordHash] FROM [AspNetUsers] AS [u] ...
+            return await _context.AspNetUsers
+                .Where(u => u.UserName == login)
+                .Select(u => u.PasswordHash)
+                .FirstOrDefaultAsync();
+            // Если пользователь не найден, метод безопасно вернет null вместо падения.
+        }
+        public async Task<AspNetUser?> GetUserAsync(string login)
+        {
+            // Валидация входных данных, чтобы не делать холостой запрос в базу
+            if (string.IsNullOrWhiteSpace(login))
+            {
+                throw new ArgumentException("Логин не может быть пустым или состоять из пробелов.", nameof(login));
+            }
+
+            return await _context.AspNetUsers
+                .AsNoTracking() // Оптимизация производительности (не тратит ресурсы на Change Tracker)
+                .Where(u => u.UserName == login)
+                .SingleOrDefaultAsync(); // Гарантирует, что логин уникален. Возвращает null, если не найден.
         }
     }
 }

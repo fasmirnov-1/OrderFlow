@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OrderFlow.Domain\OrderFlow.Domain.csproj" />
     <ProjectReference Include="..\OrderFlow.Infrastructure\OrderFlow.Infrastructure.csproj" />
   </ItemGroup>

@@ -1,0 +1,276 @@
+﻿/* Контейнер-центрировщик на весь экран */
+.auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Карточка формы */
+.auth-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+    padding: 32px 24px;
+    box-sizing: border-box;
+}
+
+/* Заголовок */
+.auth-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+    .auth-header h2 {
+        margin: 0 0 8px 0;
+        font-size: 22px;
+        color: #111827;
+        font-weight: 700;
+    }
+
+    .auth-header p {
+        margin: 0;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+/* Поля формы */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+.input-wrapper input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #111827;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+    /* Фокус на инпутах */
+    .input-wrapper input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+/* Главная кнопка "Войти" */
+.btn-auth-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #2563eb; /* Фирменный синий цвет, как на главной */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    margin-top: 8px;
+}
+
+    .btn-auth-submit:hover {
+        background-color: #1d4ed8;
+    }
+
+    .btn-auth-submit .icon {
+        width: 16px;
+        height: 16px;
+    }
+
+/* Ссылка на регистрацию внизу */
+.auth-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+    color: #4b5563;
+}
+
+    .auth-footer p {
+        margin: 0;
+    }
+
+.auth-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.15s ease-in-out;
+}
+
+    .auth-link:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+
+/* Адаптивность для маленьких экранов */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 24px 16px;
+        border: none;
+        box-shadow: none;
+        background: transparent; /* На мобилках плавно ляжет на подложку лейаута */
+    }
+}
+/* Контейнер для кнопки назад */
+.auth-back-wrapper {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* Стили текстовой кнопки со стрелкой */
+.btn-auth-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280; /* Спокойный серый цвет */
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+.btn-auth-back svg {
+    transition: transform 0.15s ease-in-out;
+}
+
+/* Эффект при наведении — текст темнеет, а стрелка слегка сдвигается влево */
+.btn-auth-back:hover {
+    color: #111827;
+}
+
+.btn-auth-back:hover svg {
+    transform: translateX(-2px);
+}
+/* Стили для карточки "Пользователь не найден" */
+.user-not-found-card {
+    border-top: 4px solid #2563eb; /* Синяя полоса сверху в тон основных кнопок */
+    text-align: center;
+    animation: slideUp 0.35s ease-out;
+}
+
+/* Контейнер для иконки */
+.info-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background-color: #eff6ff; /* Очень мягкий синий фон */
+    color: #2563eb; /* Насыщенный синий цвет иконки */
+    border-radius: 50%;
+    margin: 8px auto 20px auto;
+}
+
+.icon-info {
+    width: 26px;
+    height: 26px;
+}
+
+/* Описание проблемы */
+.info-message {
+    font-size: 14px;
+    color: #4b5563 !important;
+    line-height: 1.6;
+    margin-top: 10px;
+    padding: 0 8px;
+}
+
+    .info-message strong {
+        color: #111827;
+    }
+
+/* Блок навигационных кнопок */
+.navigation-actions {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Кнопка регистрации */
+.btn-register-accent {
+    background-color: #2563eb;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+    .btn-register-accent:hover {
+        background-color: #1d4ed8;
+    }
+
+    .btn-register-accent .icon {
+        width: 18px;
+        height: 18px;
+    }
+
+/* Блок текстовой ссылки */
+.back-to-home-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+/* Текстовая нейтральная кнопка */
+.btn-text-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+    .btn-text-secondary svg {
+        transition: transform 0.15s ease-in-out;
+    }
+
+    .btn-text-secondary:hover {
+        color: #111827;
+    }
+
+        .btn-text-secondary:hover svg {
+            transform: translateX(-3px); /* Легкое смещение стрелки влево при наведении */
+        }
+
+/* Анимация плавного появления */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

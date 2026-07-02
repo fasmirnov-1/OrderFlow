@@ -1,47 +1,79 @@
 using Microsoft.EntityFrameworkCore;
+using OrderFlow.Application.Services;
 using OrderFlow.Infrastructure.Data;
 using OrderFlow.Infrastructure.Repositories;
 using OrderFlow.Infrastructure.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. НАСТРОЙКА СЕРВИСОВ (DI КОНТЕЙНЕР)
+// =========================================================================
+// 1. РЕГИСТРАЦИЯ СЕРВИСОВ И БИБЛИОТЕК (Строго до builder.Build)
+// =========================================================================
 
-// Добавление контроллеров и представлений (MVC)
 builder.Services.AddControllersWithViews();
 
-// Добавление сервиса определения устройств (Wangkanai Detection)
+// Добавляем сервисы определения устройств (исправляет ошибку со скриншота 2)
 builder.Services.AddDetection();
 
-// Извлечение и проверка строки подключения
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrWhiteSpace(connectionString))
+// Регистрация прикладных сервисов
+builder.Services.AddScoped<OrderFlow.Application.Services.TokenManagementService>();
+
+// Настройка безопасности Cookie
+// Настройка безопасности Cookie
+builder.Services.ConfigureApplicationCookie(options =>
 {
-    throw new InvalidOperationException("Connection string 'DefaultConnection' не настроена. Проверьте appsettings.json.");
-}
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict; // Защита от CSRF
 
-// Регистрация контекста базы данных Entity Framework Core
+    // НАСТРОЙКА ВРЕМЕНИ ЖИЗНИ СЕССИИ (Исправлено)
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(20); // Автовыход при инактиве через 20 минут
+    options.SlidingExpiration = true; // Сброс таймера активности при действиях пользователя
+});
+
+// Добавляем регистрацию контекста базы данных SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// РЕГИСТРАЦИЯ РЕПОЗИТОРИЕВ И ИХ ИНТЕРФЕЙСОВ (Scoped - на каждый HTTP-запрос)
-builder.Services.AddScoped<IPaymentDetailRepo, PaymentDetailRepo>();
-builder.Services.AddScoped<IPortfolioCategoryRepo, PortfolioCategoryRepo>();
-builder.Services.AddScoped<IPortfolioItemRepo, PortfolioItemRepo>();
-builder.Services.AddScoped<ISeoSettingRepo, SeoSettingRepo>();
+// Инфраструктурные репозитории (Регистрация сопоставления интерфейс -> класс)
+// Перенесено выше builder.Build(), что исправляет ошибку со скриншота 1
+builder.Services.AddScoped<IAspNetUserTokenRepo, AspNetUserTokenRepo>();
+builder.Services.AddScoped<IAspNetUserRepo, AspNetUserRepo>();
+
+// Зарегистрируйте здесь остальные ваши репозитории, которые использует HomeController:
 builder.Services.AddScoped<IServiceRepo, ServiceRepo>();
-builder.Services.AddScoped<ISiteSettingRepo, SiteSettingRepo>();
-builder.Services.AddScoped<ISubscriptionEmailRepo, SubscriptionEmailRepo>();
-builder.Services.AddScoped<ISystemNotificationRepo, SystemNotificationRepo>();
-builder.Services.AddScoped<ITagRepo, TagRepo>();
-builder.Services.AddScoped<ITechnologyRepo, TechnologyRepo>();
+builder.Services.AddScoped<IPortfolioItemRepo, PortfolioItemRepo>();
 builder.Services.AddScoped<ITestimonialRepo, TestimonialRepo>();
+builder.Services.AddScoped<ISiteSettingRepo, SiteSettingRepo>();
+builder.Services.AddSingleton<SessionManagerService>();
+
+// 1. Настройка обработчиков аутентификации
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        // Куда перенаправлять пользователя, если он не авторизован
+        options.LoginPath = "/Login/Index";
+
+        // Время жизни куки (должно коррелировать с вашими требованиями)
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+
+        // Продлевать куки при активности пользователя
+        options.SlidingExpiration = true;
+
+        options.Cookie.Name = "OrderFlow.AuthCookie";
+    });
+
+
+// =========================================================================
+// 2. СБОРКА ПРИЛОЖЕНИЯ (Контейнер становится Read-Only)
+// =========================================================================
 
 var app = builder.Build();
 
-// 2. НАСТРОЙКА КОНВЕЙЕРА ОБРАБОТКИ HTTP-ЗАПРОСОВ (MIDDLEWARE)
 
-// Обработка ошибок для Production-окружения
+// =========================================================================
+// 3. НАСТРОЙКА КОНВЕЙЕРА MIDDLEWARE (Маршрутизация и безопасность)
+// =========================================================================
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -51,14 +83,15 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+// Включаем middleware для работы библиотеки определения устройств Wangkanai
+app.UseDetection();
+
 app.UseRouting();
 
-// ВАЖНО: Подключение middleware для парсинга User-Agent и детекции устройств (Mobile/Tablet/Desktop)
-//app.UseDetection();
+app.UseAuthentication();
+app.UseAuthorization();
 
-//app.UseAuthorization();
-
-// Настройка маршрутизации по умолчанию
+// Настройка дефолтного маршрута для MVC
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

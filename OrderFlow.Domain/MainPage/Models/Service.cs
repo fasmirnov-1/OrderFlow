@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OrderFlow.Domain.MainPage.Models
 {
-    public class Services
+    public class Service
     {
         public string? Name { get; set; }
         public string Description { get; set; }

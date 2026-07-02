@@ -1,0 +1,130 @@
+﻿@model OrderFlow.Domain.UserEditCard
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "~/Views/Shared/_Register.cshtml";
+    ViewData["Title"] = "Регистрация";
+}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Регистрация в OrderFlow</h2>
+            <p>Заполните данные для создания учетной записи</p>
+        </div>
+
+        <form id="registerForm" asp-controller="UserRegister" asp-action="Register" method="post" class="auth-form">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" id="encryptedPayload" name="encryptedPayload" />
+
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label asp-for="FirstName">Имя</label>
+                    <input type="text" id="FirstName" placeholder="Иван" autocomplete="given-name" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="LastName">Фамилия</label>
+                    <input type="text" id="LastName" placeholder="Иванов" autocomplete="family-name" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="UserName">Логин (Имя пользователя)</label>
+                <input type="text" id="UserName" placeholder="ivan_dev" autocomplete="username" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email">Email</label>
+                <input type="email" id="Email" placeholder="example@orderflow.ru" autocomplete="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password">Пароль</label>
+                <input type="password" id="Password" placeholder="••••••••" autocomplete="new-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">Подтверждение пароля</label>
+                <input type="password" id="ConfirmPassword" placeholder="••••••••" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button type="button" id="btnRegister" class="btn-auth-submit" style="background-color: #2563eb;">
+                <span>Зарегистрироваться</span>
+                <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+
+            <div class="auth-footer" style="text-align: center; margin-top: 16px;">
+                <span style="font-size: 14px; color: #6b7280;">Уже есть аккаунт? </span>
+                <a asp-controller="Login" asp-action="Index" style="font-size: 14px; color: #2563eb; text-decoration: none; font-weight: 500;">Войти</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
+    <script src="~/Scripts/Login.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(() => {
+        // Перехватываем клик по кнопке регистрации
+        $("#btnRegister").on("click", async function (e) {
+        try {
+        // Проверяем валидность формы средствами jQuery Validation (Unobtrusive)
+        if (!$("#registerForm").valid()) {
+        return; // Если есть ошибки разметки (например, пароли не совпадают), прерываем
+        }
+
+        const passwordValue = $("#Password").val();
+
+        // 1. Асинхронно вычисляем SHA-256 хэш пароля через нативный computeSha256 из Login.js
+        const passwordHash = await computeSha256(passwordValue);
+
+        if (!passwordHash) {
+        throw new Error("Не удалось сгенерировать безопасный хэш пароля.");
+        }
+
+        // 2. Формируем объект со всеми полями, соответствующими структуре маппинга бэкенда
+        const payload = {
+        firstName: $("#FirstName").val(),
+        lastName: $("#LastName").val(),
+        login: $("#UserName").val(),
+        email: $("#Email").val(),
+        passwordHash: passwordHash,
+        sessionHash: "@ViewBag.SessionHash" // Извлекаем защитный токен сессии
+        };
+
+        const jsonString = JSON.stringify(payload);
+
+        // 3. Кодируем в Base64 без падений на UTF-8 символах
+        const encryptedData = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+        return String.fromCharCode(parseInt(p1, 16));
+        }));
+
+        // 4. Записываем в единственный отправляемый input
+        $("#encryptedPayload").val(encryptedData);
+
+        // 5. Отправляем форму напрямую в DOM
+        document.getElementById("registerForm").submit();
+
+        } catch (error) {
+        console.error("Ошибка крипто-туннеля регистрации:", error);
+        alert("Ошибка безопасности: " + error.message);
+        }
+        });
+        });
+    </script>
+}

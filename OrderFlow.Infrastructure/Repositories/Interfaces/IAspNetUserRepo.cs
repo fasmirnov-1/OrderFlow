@@ -11,7 +11,7 @@ namespace OrderFlow.Infrastructure.Repositories.Interfaces
         /// <summary>
         /// Создает нового пользователя с превентивной валидацией уникальности UserName и Email.
         /// </summary>
-        Task<AspNetUser> CreateAsync(AspNetUser user);
+        Task CreateAsync(AspNetUser user);
 
         /// <summary>
         /// Возвращает пользователя по его строковому идентификатору. Если запись отсутствует — возвращает null.
@@ -33,5 +33,7 @@ namespace OrderFlow.Infrastructure.Repositories.Interfaces
         /// и блокируя операцию, если нарушается Restrict Constraint (например, наличие записей в AdminLogs).
         /// </summary>
         Task DeleteAsync(string id);
+        Task<AspNetUser?> GetUserAsync(string login);
+        public Task<bool> IsUserExists(string login);
     }
 }

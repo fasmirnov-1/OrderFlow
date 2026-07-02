@@ -1,0 +1,201 @@
+﻿/* Базовые сбросы и шрифты */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f3f4f6; /* Светло-серый фон */
+    color: #1f2937;
+}
+
+/* Центрирование контейнера на экране */
+.auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Карточка формы */
+.auth-card {
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
+}
+
+/* Заголовок формы */
+.auth-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+    .auth-header h2 {
+        margin: 0 0 8px 0;
+        font-size: 24px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .auth-header p {
+        margin: 0;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+/* Сетка для Имени и Фамилии (Ваш исходный код) */
+.form-group-row {
+    display: flex;
+    gap: 12px;
+}
+
+    .form-group-row .form-group {
+        flex: 1;
+    }
+
+/* Одиночный блок поля ввода */
+.form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+    .form-group label {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: #374151;
+    }
+
+    /* Стилизация инпутов */
+    .form-group input {
+        padding: 10px 14px;
+        font-size: 15px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        outline: none;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+        .form-group input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+/* Ошибки валидации */
+.text-danger {
+    font-size: 12px;
+    color: #ef4444;
+    margin-top: 4px;
+}
+
+/* Кнопка отправки формы */
+.btn-auth-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    margin-top: 20px;
+}
+
+    .btn-auth-submit:hover {
+        background-color: #1d4ed8 !important; /* Более темный синий при наведении */
+    }
+
+    .btn-auth-submit .icon {
+        width: 16px;
+        height: 16px;
+    }
+
+/* Адаптивность для мобильных устройств (Ваш исходный код) */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 24px 16px;
+    }
+
+    .form-group-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+/* Карточка успешного завершения */
+.success-card {
+    border-top: 4px solid #10b981; /* Мягкий зеленый изумрудный цвет успеха */
+    text-align: center;
+    animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Контейнер для иконки галочки */
+.success-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background-color: #ecfdf5; /* Очень мягкий зеленый фон */
+    color: #10b981; /* Насыщенный зеленый цвет иконки */
+    border-radius: 50%;
+    margin: 8px auto 20px auto;
+}
+
+.icon-success {
+    width: 32px;
+    height: 32px;
+}
+
+/* Текст сообщения */
+.success-message {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.6;
+    margin-top: 10px;
+    padding: 0 8px;
+}
+
+    .success-message strong {
+        color: #111827;
+    }
+
+/* Блок действий */
+.success-actions {
+    margin-top: 24px;
+}
+
+/* Кнопка продолжения */
+.btn-success-proceed {
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+    .btn-success-proceed .icon {
+        width: 18px;
+        height: 18px;
+    }
+
+/* Плавная анимация «выпрыгивания» карточки */
+@keyframes scaleIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

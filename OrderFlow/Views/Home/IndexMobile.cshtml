@@ -12,7 +12,7 @@
     Layout = "~/Views/Shared/_BackgroundMobile.cshtml";
 
     Contacts contacts = Model.Children[Types.Contacts];
-    List<Services> services = Model.Children[Types.Services];
+    List<OrderFlow.Domain.MainPage.Models.Service> services = Model.Children[Types.Services];
     List<Portfolio> portfolios = Model.Children[Types.Portfolio];
     List<Feedback> feedbacks = Model.Children[Types.Feedback];
     Details details = Model.Children[Types.Details];
@@ -30,32 +30,30 @@
                             <img style="width: 100%;" id="pctrue" src="/img/HeroImage.png" alt="ПО для бизнеса" class="hero-responsive-img" />
                         </picture>
 
-                        <form asp-controller="PageInDevelopment" asp-action="Index">
-                            <div class="hero-actions">
-                                <button class="btn btn-primary">
-                                    <span>Заказать проект</span>
-                                    <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </button>
+                        <div class="hero-actions">
+                            <button type="button" class="btn btn-primary" onclick="securePostRedirect('/PageInDevelopment/Index', { action: 'order' })">
+                                <span>Заказать проект</span>
+                                <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
 
-                                <button class="btn btn-secondary">
-                                    <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M4 2.5V13.5L13 8L4 2.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
-                                    </svg>
-                                    <span>Смотреть кейсы</span>
-                                </button>
+                            <button type="button" class="btn btn-secondary" onclick="securePostRedirect('/PageInDevelopment/Index', { action: 'cases' })">
+                                <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 2.5V13.5L13 8L4 2.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                                </svg>
+                                <span>Смотреть кейсы</span>
+                            </button>
 
-                                <div class="login-blur-wrapper">
-                                    <a asp-controller="PageInDevelopment" asp-action="Index" class="btn-login-hero">
-                                        <svg class="icon icon-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
-                                        </svg>
-                                        <span>Логин</span>
-                                    </a>
-                                </div>
+                            <div class="login-blur-wrapper">
+                                <button type="button" class="btn-login-hero" style="background: none; border: none; cursor: pointer;" onclick="securePostRedirect('/PageInDevelopment/Index', { action: 'login' })">
+                                    <svg class="icon icon-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
+                                    </svg>
+                                    <span>Логин</span>
+                                </button>
                             </div>
-                        </form>
+                        </div>
                     </td>
                 </tr>
             </table>
@@ -117,7 +115,7 @@
                     else
                     {
                         int i = 0;
-                        foreach (Services serviceItem in services)
+                        foreach (OrderFlow.Domain.MainPage.Models.Service serviceItem in services)
                         {
                             i = i + 1;
                             <td id="crdPalc_@i" class="crdplace">
@@ -210,7 +208,8 @@
                                         <div style="font-size:14px; color:#374151;">
                                             <strong>Методология:</strong> @portfolio.Metodology.Mtdology.Value.ToRussian()
                                         </div>
-                                        <a href="/PageInDevelopment/Index" class="portfolio-link">
+
+                                        <a href="/PageInDevelopment/Index" class="portfolio-link" onclick="event.preventDefault(); securePostRedirect('/PageInDevelopment/Index', { projectId: '@portfolio.ProjectName.Title' });">
                                             <span>Подробнее о кейсе</span>
                                             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1.1em; height: 1.1em;">
                                                 <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -230,14 +229,7 @@
         <td>
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
                 <div class="servicesheader" style="margin-bottom: 0;">Отзывы наших клиентов</div>
-                <div style="padding: 0 12px;">
-                    <!--<a href="/PageInDevelopment/Index" class="portfolio-link login-link" style="margin: 0;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.2em; height: 1.2em;">
-                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
-                        </svg>
-                        <span>Вход в панель</span>
-                    </a>-->
-                </div>
+                <div style="padding: 0 12px;"></div>
             </div>
 
             <table class="workspace">
@@ -340,8 +332,25 @@
 
 <script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
 <script type="text/javascript" src="~/Scripts/Background_v1.js"></script>
+<script type="text/javascript" src="~/js/crypto-tunnel.js"></script>
 
 <script type="text/javascript">
+    // Функция отправки защищенного запроса и редиректа
+    async function securePostRedirect(targetUrl, payload) {
+    try {
+    const response = await sendTunnelRequest(targetUrl, payload);
+    if (response.ok) {
+    window.location.href = targetUrl;
+    } else {
+    console.warn("Туннель отклонен сервером, используем дефолтный переход.");
+    window.location.href = targetUrl;
+    }
+    } catch (e) {
+    console.error("Ошибка крипто-туннеля:", e);
+    window.location.href = targetUrl;
+    }
+    }
+
     $("#prtflio").css("width", getWidthInPx(100));
     $("#srvces").css("width", getWidthInPx(100));
     $("#mdtlgy").css("width", getWidthInPx(100));

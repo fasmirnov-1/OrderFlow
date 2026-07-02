@@ -12,20 +12,13 @@
 @{
     Layout = "~/Views/Shared/_Background.cshtml";
 
-    // Заголовок вкладки (Title) — здесь используется главная коммерческая фраза
     ViewData["Title"] = "Создание приложений на заказ и автоматизация бизнеса";
-
-    // Описание (Description) — формирует сниппет в результатах поиска. Сюда отлично встали остальные фразы
     ViewData["MetaDescription"] = "OrderFlow — ваш программист в мире автоматизации. Мы осуществляем создание приложений на заказ любой сложности. Удобные, надежные и доступные программы для всех сфер бизнеса.";
-
-    // Ключевые слова (Keywords) — для точного вхождения фраз для поисковых систем
     ViewData["MetaKeywords"] = "создание приложений на заказ, программы для всех, ваш программист, orderflow, разработка по, автоматизация процессов";
-
-    // Канонический адрес вашей страницы
-    ViewData["CanonicalUrl"] = "https://createsoft.orderflow.abrdns.com/";
+    ViewData["CanonicalUrl"] = "http://createsoft.orderflow.abrdns.com/";
 
     Contacts contacts = Model.Children[Types.Contacts];
-    List<Services> services = Model.Children[Types.Services];
+    List<OrderFlow.Domain.MainPage.Models.Service> services = Model.Children[Types.Services];
     List<Portfolio> portfolios = Model.Children[Types.Portfolio];
     List<Feedback> feedbacks = Model.Children[Types.Feedback];
     Details details = Model.Children[Types.Details];
@@ -42,15 +35,15 @@
                     <td id="hro" class="heroplacedes">
                         <div class="hero-content-wrapper">
                             <div class="hero-actions">
-                                <form asp-controller="PageInDevelopment" asp-action="Index">
-                                    <button class="btn btn-primary">
+                                <div class="tunnel-form-surrogate">
+                                    <button type="button" class="btn btn-primary" onclick="securePostRedirect('/PageInDevelopment/Index', { action: 'order' })">
                                         <span>Заказать проект</span>
                                         <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
                                     </button>
 
-                                    <button class="btn btn-secondary">
+                                    <button type="button" class="btn btn-secondary" onclick="securePostRedirect('/PageInDevelopment/Index', { action: 'cases' })">
                                         <svg class="icon icon-play" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M4 2.5V13.5L13 8L4 2.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
                                         </svg>
@@ -58,14 +51,14 @@
                                     </button>
 
                                     <div class="login-blur-wrapper">
-                                    <a asp-controller="PageInDevelopment" asp-action="Index" class="btn btn-login-hero">
-                                        <svg class="icon icon-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
-                                        </svg>
-                                        <span>Логин</span>
-                                    </a>
+                                        <button type="button" class="btn btn-login-hero" onclick="securePostRedirect('/Login/Index', {})">
+                                            <svg class="icon icon-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
+                                            </svg>
+                                            <span>Логин</span>
+                                        </button>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                         </div>
                         <div class="hero-overlay"></div>
@@ -124,7 +117,7 @@
                     }
                     else
                     {
-                        foreach (Services serviceItem in services)
+                        foreach (OrderFlow.Domain.MainPage.Models.Service serviceItem in services)
                         {
                             <td>
                                 <div class="service-card">
@@ -204,6 +197,7 @@
                                     <td class="crdplace" style="vertical-align: top; padding: 15px;">
                                         <div class="service-card">
                                             <div class="portfolio-line blue-line"></div>
+
                                             @if (DetectionService.Device.Type != Device.Mobile)
                                             {
                                                 <div class="portfolio-preview">
@@ -211,14 +205,16 @@
                                                     <div class="preview-placeholder">&nbsp;</div>
                                                 </div>
                                             }
+
                                             <h3 class="portfolio-title">@portfolio.ProjectName.Title</h3>
                                             <div class="meta-item"><strong>Стек:</strong> @portfolio.TechnologyName</div>
                                             <div class="portfolio-meta">
                                                 <div class="meta-item"><strong>Методология: </strong>@portfolio.Metodology.Mtdology.Value.ToRussian()</div>
                                             </div>
-                                            <a class="portfolio-link" href="/PageInDevelopment/Index">
+
+                                            <a href="/PageInDevelopment/Index" onclick="event.preventDefault(); securePostRedirect('/PageInDevelopment/Index', { projectId: '@portfolio.ProjectName.Title' });">
                                                 <span>Подробнее о кейсе</span>
-                                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1.1em; height: 1.1em;">
+                                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1.1em; height: 1.1em; margin-left: 5px; display: inline-block; vertical-align: middle;">
                                                     <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                                 </svg>
                                             </a>
@@ -237,12 +233,6 @@
             <div class="workspace">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
                     <div class="servicesheader" style="text-align: left; margin: 0;">Отзывы наших клиентов</div>
-                    <!--<a asp-controller="PageInDevelopment" asp-action="Index" class="portfolio-link login-link">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 1.2em; height: 1.2em;">
-                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
-                        </svg>
-                        <span>Вход в панель</span>
-                    </a>-->
                 </div>
                 <table class="workspace">
                     @if (feedbacks != null && feedbacks.Count > 0)
@@ -391,14 +381,28 @@
 
 <script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
 <script type="text/javascript" src="~/Scripts/Background_v1.js"></script>
+<script type="text/javascript" src="~/Scripts/crypto-tunnel.js"></script>
 
 <script type="text/javascript">
-    // Функция проверки: находится ли мобильное устройство в ландшафтном режиме
+    async function securePostRedirect(targetUrl, payload) {
+    try {
+    const response = await sendTunnelRequest(targetUrl, payload);
+    if (response.ok) {
+    window.location.href = targetUrl;
+    } else {
+    console.warn("Туннель отклонен сервером, пробуем прямой переход.");
+    window.location.href = targetUrl;
+    }
+    } catch (e) {
+    console.error("Ошибка крипто-туннеля:", e);
+    window.location.href = targetUrl;
+    }
+    }
+
     function isMobileLandscape() {
     return window.matchMedia("(max-width: 667px) and (orientation: landscape)").matches;
     }
 
-    // Применяем инлайн-высоту только если это НЕ горизонтальный режим смартфона
     if (!isMobileLandscape()) {
     $("#area").css("height", getHeightInPx(92));
     $("#section-1").css("height", getHeightInPx(60));
@@ -406,11 +410,9 @@
     $("#hro").css("height", getHeightInPx(60));
     $("#cntcts").css("height", getHeightInPx(58));
     } else {
-    // Если это горизонтальный режим, сбрасываем инлайн-высоту, отдавая приоритет CSS
     $("#area, #section-1, #section-2, #hro, #cntcts").css("height", "auto");
     }
 
-    // Слушатель изменения ориентации экрана для динамического переключения
     window.addEventListener("resize", function() {
     if (isMobileLandscape()) {
     $("#area, #section-1, #section-2, #hro, #cntcts").css("height", "auto");

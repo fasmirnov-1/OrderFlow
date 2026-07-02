@@ -1,34 +1,22 @@
-﻿using OrderFlow.Domain.MainPage.Models;
-using OrderFlow.Infrastructure.Entities;
-
-namespace OrderFlow.Application.Extensions
+﻿namespace OrderFlow.Application.Extensions
 {
     public static class ServiceExtension
     {
         /// <summary>
         /// Преобразует коллекцию инфраструктурных сущностей Service в доменные модели Services.
         /// </summary>
-        public static List<Services> ToServiceModel(this IEnumerable<Service> services)
+        public static List<Domain.MainPage.Models.Service> ToServiceModel(this IEnumerable<Infrastructure.Entities.Service> services)
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
 
-            // Оптимизация памяти: если размер коллекции известен заранее, 
-            // выделяем под список точный объем памяти без лишних аллокаций.
-            var result = services is ICollection<Service> collection
-                ? new List<Services>(collection.Count)
-                : new List<Services>();
-
-            // Классический цикл foreach работает быстрее вызова делегата List.ForEach
-            foreach (var service in services)
+            // .Select().ToList() в .NET Core автоматически проверяет, реализует ли коллекция интерфейс ICollection.
+            // Если реализует, размер результирующего списка выставляется сразу, избегая лишних аллокаций памяти.
+            return services.Select(service => new Domain.MainPage.Models.Service
             {
-                result.Add(new Services
-                {
-                    Name = service.Title,
-                    Description = service.Description
-                });
-            }
-
-            return result;
+                Name = service.Title,
+                Description = service.Description
+            }).ToList();
         }
     }
 }

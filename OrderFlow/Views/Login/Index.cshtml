@@ -1,0 +1,106 @@
+﻿@using OrderFlow.Domain
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model OrderFlow.Domain.Login
+
+@{
+    Layout = "~/Views/Shared/_Login.cshtml";
+    ViewData["Title"] = "Вход в систему";
+}
+
+<div class="auth-container">
+    <div class="auth-card">
+
+        <div class="auth-back-wrapper">
+            <a href="/" class="btn-auth-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>На главную</span>
+            </a>
+        </div>
+
+        <div class="auth-header">
+            <h2>Вход в панель</h2>
+            <p>Введите ваши данные для доступа к системе</p>
+        </div>
+
+        <form asp-controller="Login" asp-action="Login" method="post" class="auth-form" id="loginForm">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="username">Логин</label>
+                <input type="text" id="username" placeholder="Введите логин" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" placeholder="••••••••" required />
+            </div>
+
+            <input type="hidden" id="encryptedPayload" name="encryptedPayload" />
+
+            <button type="button" id="btnSubmit" class="btn-auth-submit">
+                <span>Войти</span>
+                <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Ещё нет аккаунта? <a asp-controller="UserRegister" asp-action="Index" class="auth-link">Зарегистрироваться</a></p>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
+<script type="text/javascript" src="~/Scripts/Login.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(() => {
+    // Явно привязываем асинхронный обработчик клика
+    $("#btnSubmit").on("click", async function (e) {
+    try {
+    const username = $("#username").val();
+    const passwordValue = $("#password").val();
+
+    if (!username || !passwordValue) {
+    alert("Пожалуйста, заполните логин и пароль.");
+    return;
+    }
+
+    // 1. Вызываем асинхронное нативное хэширование из Login.js
+    const passwordHash = await computeSha256(passwordValue);
+
+    if (!passwordHash) {
+    throw new Error("Криптографический хэш не сформирован.");
+    }
+
+    // 2. Формируем чистый объект для туннеля
+    const payload = {
+    login: username,
+    passwordHash: passwordHash,
+    sessionHash: "@Model.sessionHash" // Значение берется напрямую из модели бэкенда
+    };
+
+    const jsonString = JSON.stringify(payload);
+
+    // 3. Упаковываем в Base64 для передачи через FromForm
+    const encryptedData = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+    return String.fromCharCode(parseInt(p1, 16));
+    }));
+
+    // 4. Пишем данные в скрытый инпут
+    $("#encryptedPayload").val(encryptedData);
+
+    // 5. Отправляем форму на сервер напрямую через DOM
+    document.getElementById("loginForm").submit();
+
+    } catch (error) {
+    console.error("Критическая ошибка авторизации:", error);
+    alert("Ошибка: " + error.message);
+    }
+    });
+    });
+</script>

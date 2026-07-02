@@ -1,0 +1,42 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "~/Views/Shared/_Login.cshtml"; // Используем ваш базовый лейаут
+    ViewData["Title"] = "Сессия прервана";
+}
+
+<div class="auth-container">
+    <div class="auth-card error-card">
+
+        <div class="error-icon-wrapper">
+            <svg class="icon-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+        </div>
+
+        <div class="auth-header">
+            <h2>Сессия аннулирована</h2>
+            <p class="error-message">
+                @if (ViewData["ErrorMessage"] != null)
+                {
+                    @ViewData["ErrorMessage"]
+                }
+                else
+                {
+                    <text>Время действия вашей сессии истекло из-за длительного отсутствия активности. Пожалуйста, авторизуйтесь заново.</text>
+                }
+            </p>
+        </div>
+
+        <div class="error-actions">
+            <a asp-controller="Login" asp-action="Index" class="btn-auth-submit btn-error-return">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
+                </svg>
+                <span>Вернуться к авторизации</span>
+            </a>
+        </div>
+
+    </div>
+</div>
