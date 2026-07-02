@@ -18,6 +18,11 @@
     Details details = Model.Children[Types.Details];
 }
 
+<form id="secureTunnelForm" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="tunnelPayload" name="encryptedPayload" />
+</form>
+
 <table id="area" class="workspace" style="width: 100%;">
     <tr id="section-1">
         <td class="heroplace">
@@ -46,7 +51,7 @@
                             </button>
 
                             <div class="login-blur-wrapper">
-                                <button type="button" class="btn-login-hero" style="background: none; border: none; cursor: pointer;" onclick="securePostRedirect('/PageInDevelopment/Index', { action: 'login' })">
+                                <button type="button" class="btn-login-hero" style="background: none; border: none; cursor: pointer;" onclick="securePostRedirect('/Login/Index', { action: 'login_flow' })">
                                     <svg class="icon icon-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
                                     </svg>
@@ -209,7 +214,7 @@
                                             <strong>Методология:</strong> @portfolio.Metodology.Mtdology.Value.ToRussian()
                                         </div>
 
-                                        <a href="/PageInDevelopment/Index" class="portfolio-link" onclick="event.preventDefault(); securePostRedirect('/PageInDevelopment/Index', { projectId: '@portfolio.ProjectName.Title' });">
+                                        <a href="#" class="portfolio-link" onclick="event.preventDefault(); securePostRedirect('/PageInDevelopment/Index', { projectId: '@portfolio.ProjectName.Title' });">
                                             <span>Подробнее о кейсе</span>
                                             <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1.1em; height: 1.1em;">
                                                 <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -321,7 +326,7 @@
                 </div>
 
                 <div style="padding: 12px 20px; background: #f9fafb; border-top: 1px solid #e5e7eb; text-align: right;">
-                    <button type="button" style="background: #ffffff; color: #374151; border: 1px solid #d1d5db; padding: 8px 16px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; width: 100%; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);" onclick="navigator.clipboard.writeText('Смирнов Федор Александрович\nИНН: @details.Inn\nР/с: @details.Check\nБанк: @details.BankName'); alert('Все реквизиты скопированы в буфер обмена!');">
+                    <button type="button" style="background: #ffffff; color: #374151; border: 1px solid #d1d5db; padding: 8px 16px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; width: 100%; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05)" onclick="navigator.clipboard.writeText('Смирнов Федор Александрович\nИНН: @details.Inn\nР/с: @details.Check\nБанк: @details.BankName'); alert('Все реквизиты скопированы в буфер обмена!');">
                         Скопировать все реквизиты
                     </button>
                 </div>
@@ -332,25 +337,39 @@
 
 <script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
 <script type="text/javascript" src="~/Scripts/Background_v1.js"></script>
-<script type="text/javascript" src="~/js/crypto-tunnel.js"></script>
 
 <script type="text/javascript">
-    // Функция отправки защищенного запроса и редиректа
-    async function securePostRedirect(targetUrl, payload) {
+    // ИСПРАВЛЕНО: Функция упаковки payload и выполнения безопасного POST-редиректа через туннель
+    function securePostRedirect(targetUrl, payloadData) {
     try {
-    const response = await sendTunnelRequest(targetUrl, payload);
-    if (response.ok) {
-    window.location.href = targetUrl;
-    } else {
-    console.warn("Туннель отклонен сервером, используем дефолтный переход.");
-    window.location.href = targetUrl;
-    }
+    // Примешиваем защитный хэш текущей сессии во избежание Replay-атак
+    // Используем Html.Raw для сохранения символов типа '+' в хэше
+    const fullPayload = {
+    ...payloadData,
+    sessionHash: "@Html.Raw(ViewBag.SessionHash)"
+    };
+
+    const jsonString = JSON.stringify(fullPayload);
+
+    // Защищенное кодирование в Base64 (без падений на UTF-8/кириллице)
+    const encryptedData = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+    return String.fromCharCode(parseInt(p1, 16));
+    }));
+
+    // Конфигурируем динамическую форму под целевой URL и отправляем
+    const $form = $("#secureTunnelForm");
+    $form.attr("action", targetUrl);
+    $("#tunnelPayload").val(encryptedData);
+
+    $form[0].submit();
     } catch (e) {
-    console.error("Ошибка крипто-туннеля:", e);
+    console.error("Критическая ошибка инициализации туннеля перенаправления:", e);
+    // Фолбэк на дефолтный GET в случае непредвиденного сбоя скрипта
     window.location.href = targetUrl;
     }
     }
 
+    // Блок адаптивного выравнивания размеров ячеек таблицы
     $("#prtflio").css("width", getWidthInPx(100));
     $("#srvces").css("width", getWidthInPx(100));
     $("#mdtlgy").css("width", getWidthInPx(100));

@@ -28,6 +28,7 @@ namespace OrderFlow.Controllers
         }
 
         [HttpGet]
+        [HttpPost]
         public IActionResult Index()
         {
             // Получаем уже готовый хэшированный строковый ключ
