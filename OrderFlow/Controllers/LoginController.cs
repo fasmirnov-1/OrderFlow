@@ -1,148 +1,126 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿// Controllers/LoginController.cs
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OrderFlow.Application.Services;
 using OrderFlow.Domain;
-using OrderFlow.Infrastructure.Entities;
-using OrderFlow.Infrastructure.Repositories.Interfaces;
-using System.Net;
+using OrderFlow.Domain.DTO;
+using OrderFlow.Infrastructure.Data;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 
 namespace OrderFlow.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly SessionManagerService _sessionManagerService;
-        private readonly IAspNetUserRepo _userRepo;
-        private readonly TokenManagementService _tokenManagementService;
+        private readonly ITokenLifecycleService _tokenService;
+        private readonly AppDbContext _context;
 
-        public LoginController(
-            SessionManagerService sessionManagerService,
-            IAspNetUserRepo userRepo,
-            TokenManagementService tokenManagementService)
+        public LoginController(ITokenLifecycleService tokenService, AppDbContext context)
         {
-            _sessionManagerService = sessionManagerService ?? throw new ArgumentNullException(nameof(sessionManagerService));
-            _userRepo = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
-            _tokenManagementService = tokenManagementService ?? throw new ArgumentNullException(nameof(tokenManagementService));
+            _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         [HttpGet]
-        [HttpPost]
         public IActionResult Index()
         {
-            // Получаем уже готовый хэшированный строковый ключ
-            string sessionHash = _sessionManagerService.CreateSession();
-
-            // Передаем модель во View без повторного хэширования!
-            var login = new Login
+            // Передаем во View модель с сгенерированным sessionHash для защиты от CSRF/Replay-атак
+            var model = new Login
             {
-                sessionHash = sessionHash
+                sessionHash = Guid.NewGuid().ToString()
             };
-
-            return View(login);
+            return View(model);
         }
 
         /// <summary>
-        /// POST: Принимает зашифрованный payload из крипто-туннеля фронтенда
+        /// Точка входа для авторизации. Принимает форму с Base64 строкой из крипто-туннеля.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Consumes("application/x-www-form-urlencoded")] // Ждем данные из формы
         public async Task<IActionResult> Login([FromForm] string encryptedPayload)
         {
-            // 1. Проверяем, что зашифрованный контейнер вообще дошел
-            if (string.IsNullOrWhiteSpace(encryptedPayload))
+            if (string.IsNullOrEmpty(encryptedPayload))
             {
-                return RedirectToAction(nameof(UserNotFoundError));
+                ModelState.AddModelError("", "Криптографический пакет пуст или поврежден.");
+                return View("Index", new Login { sessionHash = Guid.NewGuid().ToString() });
             }
 
-            // 2. Расшифровываем payload туннеля в словарь
-            var payload = DecryptTunnelPayload(encryptedPayload);
-            if (payload == null)
+            DecryptedLoginPayload? payload;
+            try
             {
-                return RedirectToAction(nameof(SessionError));
+                // 1. ДЕКОДИРОВАНИЕ КРИПТО-ТУННЕЛЯ: 
+                // Восстанавливаем байты из Base64 (аналог btoa на клиенте)
+                byte[] base64Bytes = Convert.FromBase64String(encryptedPayload);
+                string decodedUriString = Encoding.UTF8.GetString(base64Bytes);
+
+                // Декодируем URI-компоненты (аналог encodeURIComponent на клиенте)
+                string jsonString = Uri.UnescapeDataString(decodedUriString);
+
+                // Десериализуем в типизированный объект
+                payload = JsonSerializer.Deserialize<DecryptedLoginPayload>(jsonString, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (payload == null || string.IsNullOrWhiteSpace(payload.Login) || string.IsNullOrWhiteSpace(payload.PasswordHash))
+                {
+                    ModelState.AddModelError("", "Некорректная структура крипто-пакета.");
+                    return View("Index", new Login { sessionHash = Guid.NewGuid().ToString() });
+                }
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "Ошибка дешифрации безопасного туннеля.");
+                return View("Index", new Login { sessionHash = Guid.NewGuid().ToString() });
             }
 
-            // 3. Безопасно извлекаем данные, которые упаковал login.js
-            payload.TryGetValue("login", out var loginObj);
-            payload.TryGetValue("passwordHash", out var passwordHashObj);
-            payload.TryGetValue("sessionHash", out var sessionHashObj);
+            // 2. ПОИСК ПОЛЬЗОВАТЕЛЯ: Ищем в базе данных по полученному Login
+            var user = await _context.AspNetUsers
+                .FirstOrDefaultAsync(u => u.UserName == payload.Login);
 
-            string login = loginObj?.ToString() ?? string.Empty;
-            string passwordHash = passwordHashObj?.ToString() ?? string.Empty;
-            string sessionHash = sessionHashObj?.ToString() ?? string.Empty;
-
-            // 4. Проверяем верхнеуровневую валидность полей
-            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(passwordHash) || string.IsNullOrWhiteSpace(sessionHash))
+            // 3. БЕЗОПАСНАЯ ВЕРИФИКАЦИЯ ХЭШЕЙ:
+            // Сверяем хэш, вычисленный на клиенте, с хэшем из базы данных.
+            // Используется CryptoService.VerifyHashes с алгоритмом FixedTimeEquals для защиты от атак по времени.
+            if (user == null || string.IsNullOrEmpty(user.PasswordHash) ||
+                !CryptoService.VerifyHashes(user.PasswordHash, payload.PasswordHash))
             {
-                return RedirectToAction(nameof(UserNotFoundError));
+                ModelState.AddModelError("", "Неверный логин или пароль.");
+                return View("Index", new Login { sessionHash = Guid.NewGuid().ToString() });
             }
 
-            // 5. Валидация временной сессии крипто-туннеля
-            Guid? session = _sessionManagerService.GetSession(sessionHash);
-            if (session == null)
-            {
-                return RedirectToAction(nameof(SessionError));
-            }
+            // 4. УПРАВЛЕНИЕ ВРЕМЕНЕМ ЖИЗНИ ТОКЕНА (СЕССИИ):
+            // Генерируем уникальный GUID-токен сессии пользователя
+            string sessionToken = Guid.NewGuid().ToString();
 
-            // 6. Извлечение пользователя из БД
-            AspNetUser? user = await _userRepo.GetUserAsync(login);
-            if (user == null)
-            {
-                return RedirectToAction(nameof(UserNotFoundError));
-            }
+            // Сохраняем/обновляем токен в системной таблице dbo.AspNetUserTokens через репозиторий
+            await _tokenService.CreateSessionTokenAsync(user.Id, sessionToken);
 
-            // 7. Проверка соответствия хэшей паролей
-            if (string.IsNullOrEmpty(user.PasswordHash) || !CryptoService.VerifyHashes(user.PasswordHash, passwordHash))
-            {
-                return RedirectToAction(nameof(PasswordNotCorrectError));
-            }
-
-            // 8. Инициализация Cookie-авторизации (на базе вашего Program.cs)
+            // 5. ФОРМИРОВАНИЕ СИНХРОННОЙ АВТОРИЗАЦИОННОЙ КУКИ:
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
-                new Claim(ClaimTypes.Role, "Admin")
+                new Claim("SessionToken", sessionToken) // Помещаем GUID сессии в куку для сверки в Events
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
             var authProperties = new AuthenticationProperties
             {
                 IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(20)
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(2) // Синхронизировано с жестким временем жизни
             };
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+            // Вызываем SignInAsync с явным указанием схемы (ошибка "No sign-in handlers" устранена)
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
 
-            // 9. Удаление сессии туннеля после успешного входа
-            _sessionManagerService.RemoveSession(sessionHash);
-
-            // 10. Выписка инфраструктурного токена
-            var token = new AspNetUserToken()
-            {
-                UserId = user.Id,
-                LoginProvider = "Local",
-                Name = "RefreshToken",
-                Value = Guid.NewGuid().ToString()
-            };
-            try
-            {
-                await _tokenManagementService.WriteTokenAsync(token);
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("Токен для пользователя") == true && ex.Message.Contains("уже существует") == true)
-                {
-                    RedirectToAction("Index", "Home");
-                }
-            }
-
-            // Фиксация времени активности
-            user.LastLoginAt = DateTime.UtcNow;
-            await _userRepo.UpdateAsync(user);
-
+            // Перенаправляем пользователя в закрытую зону приложения
             return RedirectToAction("Index", "Home");
         }
 
@@ -150,35 +128,22 @@ namespace OrderFlow.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                // При явном логауте уничтожаем сессионный токен из базы данных
+                await _tokenService.InvalidateTokenAsync(userId);
+            }
+
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index");
         }
 
-        [HttpGet] public IActionResult SessionError() => View();
-        [HttpGet] public IActionResult UserNotFoundError() => View();
-        [HttpGet] public IActionResult PasswordNotCorrectError() => View();
-
-        /// <summary>
-        /// Вспомогательный метод дешифрации Base64-туннеля (идентичен логике в HomeController)
-        /// </summary>
-        private Dictionary<string, string>? DecryptTunnelPayload(string encryptedPayload)
+        [HttpGet]
+        public IActionResult SessionError()
         {
-            if (string.IsNullOrEmpty(encryptedPayload)) return null;
-            try
-            {
-                // 1. Декодируем Base64 в исходный JSON-текст
-                string decryptedJson = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encryptedPayload));
-
-                // 2. ИСПРАВЛЕНО: Принудительно декодируем HTML-сущности (превратит &#x2B; обратно в +)
-                decryptedJson = WebUtility.HtmlDecode(decryptedJson);
-
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                return JsonSerializer.Deserialize<Dictionary<string, string>>(decryptedJson, options);
-            }
-            catch
-            {
-                return null;
-            }
+            // Сюда middleware перенаправляет пользователя, если кука или токен в БД истекли
+            return View();
         }
     }
 }
