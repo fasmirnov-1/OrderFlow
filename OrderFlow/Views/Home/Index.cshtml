@@ -27,6 +27,8 @@
     int tail = feedbacks != null ? feedbacks.Count % 3 : 0;
 }
 
+@Html.AntiForgeryToken()
+
 <table id="area" class="workspace">
     <tr id="section-1">
         <td class="heroplace">
@@ -50,25 +52,29 @@
                                         <span>Смотреть кейсы</span>
                                     </button>
 
-                                    <div class="login-blur-wrapper">
+                                    <div class="login-blur-wrapper" style="position: relative; display: inline-block;">
                                         @if (User.Identity.IsAuthenticated)
                                         {
-                                            <div class="user-profile-container">
-                                                <div class="user-profile-name" onclick="toggleUserDropdown(event)">
-                                                    <span>@User.FindFirst("FullName")?.Value</span>
+                                            <div class="user-profile-container" style="position: relative; display: inline-block;">
+                                                <div class="user-profile-name" onclick="toggleUserDropdown(event)" style="cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(255,255,255,0.1); border-radius: 6px; color: #fff; user-select: none;">
+                                                    <span>@User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value</span>
                                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                                 </div>
-                                                <div id="userDropdown" class="user-dropdown-menu">
-                                                    <a class="user-dropdown-item" onclick="securePostRedirect('/Profile/Edit', {})">Редактировать профиль</a>
-                                                    <div class="user-dropdown-divider"></div>
-                                                    <a class="user-dropdown-item" onclick="securePostRedirect('/Account/Logout', {})" style="color: #dc2626;">Выход</a>
+
+                                                @* Выпадающее меню с явным z-index и абсолютным позиционированием *@
+                                                <div id="userDropdown" class="user-dropdown-menu" style="display: none; position: absolute; top: 100%; right: 0; mt: 5px; background: #ffffff; min-width: 200px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 99999; padding: 6px 0;">
+                                                    <a class="user-dropdown-item" onclick="securePostRedirect('/Profile/Edit', {})" style="display: block; padding: 10px 16px; color: #374151; cursor: pointer; text-decoration: none; font-size: 14px;">Редактировать профиль</a>
+                                                    <div class="user-dropdown-divider" style="height: 1px; background-color: #e5e7eb; margin: 4px 0;"></div>
+
+                                                    @* Кнопка выхода отправляет запрос на правильный контроллер /Login/Logout *@
+                                                    <a class="user-dropdown-item" onclick="handleLogout(event)" style="display: block; padding: 10px 16px; color: #dc2626; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: 500;">Выход</a>
                                                 </div>
                                             </div>
                                         }
                                         else
                                         {
                                             <button type="button" class="btn btn-login-hero" onclick="securePostRedirect('/Login/Index', {})">
-                                                <svg class="icon icon-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <svg class="icon icon-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; margin-right: 8px; display: inline-block; vertical-align: middle;">
                                                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
                                                 </svg>
                                                 <span>Логин</span>
@@ -401,35 +407,66 @@
 <script type="text/javascript" src="~/Scripts/crypto-tunnel.js"></script>
 
 <script type="text/javascript">
-    // Функция открытия/закрытия меню
+    // Открытие/закрытие меню через прямую манипуляцию стилем display
     function toggleUserDropdown(event) {
     event.stopPropagation();
-    document.getElementById("userDropdown").classList.toggle("show");
+    var dropdown = document.getElementById("userDropdown");
+    if (dropdown) {
+    if (dropdown.style.display === "none" || dropdown.style.display === "") {
+    dropdown.style.display = "block";
+    } else {
+    dropdown.style.display = "none";
+    }
+    }
     }
 
-    // Закрытие меню при клике в любое другое место экрана
+    // Закрытие меню при клике в любую точку экрана
     window.addEventListener("click", function() {
     var dropdown = document.getElementById("userDropdown");
-    if (dropdown && dropdown.classList.contains("show")) {
-    dropdown.classList.remove("show");
+    if (dropdown) {
+    dropdown.style.display = "none";
     }
     });
+    // Специализированный метод для безопасного выхода из системы
+    function handleLogout(event) {
+    event.preventDefault();
+
+    // Ищем существующий на странице токен валидации (он есть в форме #loginForm)
+    var token = $('input[name="__RequestVerificationToken"]').val();
+
+    // Если туннель поддерживает передачу форм, шлем туда, либо отправляем стандартный POST
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/Login/Logout';
+
+    if (token) {
+    var tokenInput = document.createElement('input');
+    tokenInput.type = 'hidden';
+    tokenInput.name = '__RequestVerificationToken';
+    tokenInput.value = token;
+    form.appendChild(tokenInput);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+    }
 
     async function securePostRedirect(targetUrl, payload) {
-    try {
-    const response = await sendTunnelRequest(targetUrl, payload);
-    if (response.ok) {
-    window.location.href = targetUrl;
-    } else {
-    console.warn("Туннель отклонен сервером, пробуем прямой переход.");
-    window.location.href = targetUrl;
-    }
-    } catch (e) {
-    console.error("Ошибка крипто-туннеля:", e);
-    window.location.href = targetUrl;
-    }
+        try {
+            const response = await sendTunnelRequest(targetUrl, payload);
+            if (response.ok) {
+                window.location.href = targetUrl;
+            } else {
+                console.warn("Туннель отклонен сервером, пробуем прямой переход.");
+                window.location.href = targetUrl;
+            }
+        } catch (e) {
+            console.error("Ошибка крипто-туннеля:", e);
+            window.location.href = targetUrl;
+        }
     }
 
+    // Ниже идет ваш существующий код обработки ресайза и высоты таблиц...
     function isMobileLandscape() {
     return window.matchMedia("(max-width: 667px) and (orientation: landscape)").matches;
     }
@@ -455,5 +492,4 @@
     $("#cntcts").css("height", getHeightInPx(58));
     }
     });
-    console.log(navigator.userAgent);
-</script>
+ </script>

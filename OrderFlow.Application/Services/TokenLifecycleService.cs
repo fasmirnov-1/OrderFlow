@@ -11,7 +11,7 @@ namespace OrderFlow.Application.Services
         private readonly AppDbContext _context; // Используется для массовой очистки при старте приложения
 
         // Строгие константы для изоляции сессионных токенов RAUTH
-        public const string ProviderName = "RAUTH_Session";
+        public const string ProviderName = "Site Session";
         public const string TokenName = "UserSessionToken";
 
         public TokenLifecycleService(IAspNetUserTokenRepo tokenRepo, AppDbContext context)

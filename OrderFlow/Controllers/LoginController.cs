@@ -25,6 +25,7 @@ namespace OrderFlow.Controllers
         }
 
         [HttpGet]
+        [HttpPost]
         public IActionResult Index()
         {
             // Передаем во View модель с сгенерированным sessionHash для защиты от CSRF/Replay-атак

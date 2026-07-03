@@ -6,9 +6,11 @@ body {
     padding: 0;
     font-family: system-ui, -apple-system, sans-serif;
     background-color: #f9fafb;
+    overflow-x: hidden;
+    overflow-y: auto !important; /* Гарантирует появление нативного скролла */
 }
 
-/* Принудительный перевод всех табличных элементов в блочные */
+/* Изоляция табличной структуры от жестких расчетов скрипта Background_v1.js */
 .workspace,
 table#area,
 table#area > tbody,
@@ -16,347 +18,227 @@ table#area > tbody > tr,
 table#area > tbody > tr > td {
     display: block !important;
     width: 100% !important;
-    height: auto !important;
+    height: auto !important; /* Убирает пустое пространство снизу и наложение */
     box-sizing: border-box;
 }
 
-/* Первый экран: убираем padding по бокам, чтобы картинка встала вплотную к краям экрана */
-#section-1 {
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-.heroplace {
-    display: block !important;
-    width: 100% !important;
-    padding: 0 !important; /* Убрали боковые отступы для растягивания баннера */
-    margin: 0 !important;
-}
-.contactspace {
-    display: block !important;
-    width: 100% !important;
-    padding: 12px !important;
-    box-sizing: border-box;
-}
-
-/* Контейнер для Hero-изображения */
+/* Первый экран: гарантируем видимость и адаптивность границ */
 #hro {
-    position: relative;
-    display: block !important;
+    position: relative !important;
     width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-/* Растягиваем картинку на 100% ширины вьюпорта */
-#hroimg {
-    width: 100vw !important; /* Растягивает строго на всю ширину экрана */
+    min-height: 580px !important; /* Фиксирует высоту от сжатия, но позволяет расти вниз */
     height: auto !important;
-    max-height: 60vh !important; /* Ограничиваем по высоте, чтобы не занимала весь экран по вертикали */
-    object-fit: cover;
-    display: block;
-    border-radius: 0; /* Убираем скругления, так как картинка теперь идет в край */
-}
-
-/* Действия (кнопки) на баннере — добавляем им отступ, так как у родителя padding теперь 0 */
-.hero-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 15px;
-    width: 100%;
-    padding: 0 12px; /* Добавили отступы кнопкам, чтобы они не липли к краям экрана */
-    box-sizing: border-box;
-}
-
-.btn {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 14px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.btn-primary {
-    background-color: #2563eb;
-    color: white;
-}
-
-.btn-secondary {
-    background-color: #e5e7eb;
-    color: #374151;
-}
-
-.icon {
-    width: 16px;
-    height: 16px;
-}
-
-/* Заголовки разделов */
-.servicesheader {
-    font-size: 20px;
-    font-weight: 700;
-    margin-top: 24px;
-    margin-bottom: 16px;
-    color: #111827;
-    padding: 0 12px;
-}
-
-/* Сетки блоков (Услуги, Методологии, Портфолио, Отзывы) */
-#section-2 table.workspace tr,
-table.workspace tbody tr,
-table tbody tr {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 16px !important;
-}
-
-.methodology-crdplace, .crdplace {
+    overflow: hidden;
     display: block !important;
-    width: 100% !important;
-    padding: 0 12px !important;
-    box-sizing: border-box;
 }
 
-/* Универсальная карточка */
-.service-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 20px;
-    box-sizing: border-box;
-    position: relative;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-}
-
-    .service-card h3 {
-        margin-top: 8px;
-        margin-bottom: 10px;
-        font-size: 18px;
-        color: #111827;
-    }
-
-    .service-card p {
-        color: #4b5563;
-        font-size: 14px;
-        line-height: 1.5;
-        margin: 0;
-    }
-
-/* Декоративные линии */
-.methodology-line, .portfolio-line, .reviews-line {
-    /*position: absolute;*/
+.hero-picture-container {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 4px;
-    border-radius: 12px 12px 0 0;
+    height: 100%;
+    z-index: 1;
 }
 
-.blue-line {
-    background-color: #1A56DB;
+.hero-bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 
-.purple-line {
-    background-color: #7C3AED;
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 100%);
+    z-index: 2;
+    pointer-events: none;
 }
 
-/* Иконки в карточках */
-.card-icon {
-    width: 40px;
-    height: 40px;
+.hero-content-wrapper {
+    position: relative;
+    z-index: 3;
+    padding: 30px 20px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f3f4f6;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
+}
+
+.hero-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.3;
+    margin: 0 0 12px 0;
+}
+
+.hero-description {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #4b5563;
+    margin: 0 0 24px 0;
+}
+
+.hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Стилизация кнопок */
+.btn {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 0 20px;
     border-radius: 8px;
-    margin-bottom: 12px;
-}
-
-/* Индикаторы (Бейджи) */
-.methodology-type-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    background: #EBF5FF;
-    color: #1E429F;
-    font-size: 12px;
-    font-weight: 500;
-    border-radius: 4px;
-    margin-bottom: 12px;
-}
-
-.purple-badge {
-    background: #F3E8FF;
-    color: #6B21A8;
-}
-
-.methodology-card-footer {
-    margin-top: 14px;
-    padding-top: 10px;
-    border-top: 1px solid #f3f4f6;
-    font-size: 13px;
-}
-
-    .methodology-card-footer span {
-        font-weight: 600;
-        color: #374151;
-    }
-
-    .methodology-card-footer p {
-        margin: 2px 0 0 0;
-        color: #6b7280;
-    }
-
-/* Ссылки */
-.portfolio-link {
-    color: #2563eb;
-    text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    margin-top: 15px;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    height: 48px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: #ffffff !important;
+    border: none;
+}
+
+.btn-secondary {
+    background: #ffffff;
+    color: #1f2937 !important;
+    border: 1px solid #d1d5db;
+}
+
+/* Профиль и выпадающее меню пользователя */
+.user-profile-container {
+    position: relative;
+    width: 100%;
+}
+
+.user-profile-name {
+    cursor: pointer;
     font-size: 14px;
-    font-weight: 500;
-}
-
-/* Отзывы */
-.reviews-rating {
-    color: #FBBF24;
-    font-size: 16px;
-    margin-bottom: 8px;
-}
-
-.reviews-text {
-    font-style: italic;
-    color: #374151;
-    font-size: 14px;
-}
-
-.reviews-author-meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 14px;
-    padding-top: 10px;
-    border-top: 1px solid #f3f4f6;
-}
-
-.author-avatar {
-    width: 36px;
-    height: 36px;
-    background: #EFF6FF;
-    color: #2563eb;
-    border-radius: 50%;
-    display: flex;
+    font-weight: 600;
+    height: 48px;
+    padding: 0 20px;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    color: #111827;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 13px;
+    gap: 6px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
-/* Карточки контактов */
-.contacts-mobile-wrapper {
-    padding: 10px 0;
-}
-
-.mobile-contact-card {
+.user-dropdown-menu {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 105%;
     background: #ffffff;
     border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 999;
 }
 
-.contact-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    color: #374151;
-    font-size: 14px;
-}
-
-    .contact-label img {
-        width: 20px;
-        height: 20px;
+    .user-dropdown-menu .show {
+        display: block !important;
     }
 
-.contact-value {
-    color: #2563eb;
-    text-decoration: none;
-    font-weight: 500;
+.user-dropdown-item {
+    display: block;
+    padding: 12px 16px;
     font-size: 14px;
-}
-/* Полностью убираем обертку размытия, оставляя обычный контейнер */
-.hero-actions .login-blur-wrapper {
-    display: inline-block;
-    vertical-align: middle;
-    margin: 0;
-    padding: 0;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    mask-image: none !important;
-    -webkit-mask-image: none !important;
+    color: #374151;
+    text-decoration: none;
 }
 
-/* Новые контрастные стили для кнопки «Вход в панель» */
+.user-dropdown-divider {
+    height: 1px;
+    background-color: #e5e7eb;
+    margin: 4px 0;
+}
+
+.login-blur-wrapper {
+    width: 100%;
+}
+
 .btn-login-hero {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 10px 24px;
+    height: 48px;
+    width: 100%;
     font-size: 14px;
     font-weight: 600;
-    /* Явный темно-серый цвет текста для отличной читаемости на светлом фоне */
-    color: #374151 !important;
+    color: #ffffff !important;
     text-decoration: none;
-    background: transparent;
-    border: none;
-    transition: color 0.2s ease-in-out;
-    cursor: pointer;
+    background: #111827;
+    border-radius: 8px;
 }
 
-    /* Цвет иконки (сделаем синим, как у основной кнопки, для акцента) */
-    .btn-login-hero .icon-login {
-        width: 1.2em;
-        height: 1.2em;
-        flex-shrink: 0;
-        stroke: #2563eb;
-    }
-
-    /* Эффект при наведении на десктопе */
-    .btn-login-hero:hover {
-        color: #111827 !important;
-    }
-
-/* Медиа-запрос для мобилки (как на скриншоте image_31fce8.png) */
-@media (max-width: 768px) {
-    .hero-actions {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-    }
-
-        .hero-actions .login-blur-wrapper {
-            width: 100%;
-            text-align: center;
-            margin-top: 4px;
-        }
-
-    .btn-login-hero {
-        width: auto;
-        padding: 8px 16px;
-    }
+/* Секция услуг */
+.servicesplace {
+    padding: 40px 20px;
+    background: #ffffff;
 }
+
+.servicesheader {
+    font-size: 22px;
+    font-weight: 800;
+    color: #111827;
+    text-align: center;
+    margin: 0 0 20px 0;
+}
+
+.service-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+}
+
+    .service-card h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+        margin: 0 0 6px 0;
+    }
+
+    .service-card p {
+        font-size: 13.5px;
+        line-height: 1.5;
+        color: #4b5563;
+        margin: 0;
+    }
+
+#userDropdown {
+    display: none; /* Начальное состояние */
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 99999 !important; /* Максимально высокий приоритет */
+    /* ... остальные стили ... */
+}
+
+    #userDropdown.show {
+        display: block !important;
+        z-index: 99999 !important; /* Максимально высокий приоритет */
+    }

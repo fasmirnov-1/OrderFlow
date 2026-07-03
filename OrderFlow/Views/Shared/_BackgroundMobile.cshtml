@@ -1,17 +1,14 @@
 ﻿<!DOCTYPE html>
-
 <html>
 <head>
-    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>@ViewBag.Title</title>
 
     <link rel="stylesheet" href="~/Scripts/CSS/BackgroundMobile.css" />
 </head>
-<body id="bdy">
+<body id="bdy" style="margin: 0; padding: 0; overflow-x: hidden; -webkit-text-size-adjust: 100%;">
     <div id="screenSpace" class="workspace">
-        <div id="header" class="headers">
-            <span class="headertext">@Model.Header</span>
-        </div>
         @RenderBody()
     </div>
 
@@ -19,7 +16,10 @@
     <script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
 
     <script type="text/javascript">
-        $("#bdy").css("width", getWidthInPx(100));
+        $(document).ready(function() {
+        // Устанавливаем ширину под мобильный экран без жесткого слома потока данных
+        $("#bdy").css("width", "100%");
+        });
     </script>
 </body>
 </html>

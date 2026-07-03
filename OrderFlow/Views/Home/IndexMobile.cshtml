@@ -23,365 +23,206 @@
     <input type="hidden" id="tunnelPayload" name="encryptedPayload" />
 </form>
 
-<table id="area" class="workspace" style="width: 100%;">
-    <tr id="section-1">
-        <td class="heroplace">
-            <table class="workspace">
-                <tr>
-                    <td id="hro">
-                        <picture class="hero-picture-container">
-                            <source media="(max-width: 667px) and (orientation: landscape)" srcset="/img/HeroImage.png">
-                            <source media="(max-width: 768px) and (orientation: portrait)" srcset="/img/HeroImageMobile.png">
-                            <img style="width: 100%;" id="pctrue" src="/img/HeroImage.png" alt="ПО для бизнеса" class="hero-responsive-img" />
-                        </picture>
+<form id="logoutForm" method="post" action="/Login/Logout" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
 
-                        <div class="hero-actions">
-                            <button type="button" class="btn btn-primary" onclick="securePostRedirect('/PageInDevelopment/Index', { action: 'order' })">
-                                <span>Заказать проект</span>
-                                <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
+<div style="width: 100%; overflow-x: hidden;">
 
-                            <button type="button" class="btn btn-secondary" onclick="securePostRedirect('/PageInDevelopment/Index', { action: 'cases' })">
-                                <svg class="icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4 2.5V13.5L13 8L4 2.5Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
-                                </svg>
-                                <span>Смотреть кейсы</span>
-                            </button>
+    <div id="hro" style="position: relative; width: 100%; min-height: 500px; overflow: hidden; margin: 0; padding: 0; overflow: visible">
+        <picture style="display: block; width: 100%; height: 100%;">
+            <source media="(max-width: 667px) and (orientation: landscape)" srcset="/img/HeroImage.png" />
+            <img src="/img/HeroImageMobile.png" alt="Background" style="width: 100% !important; height: 100% !important; object-fit: cover; display: block;" />
+        </picture>
 
-                            <div class="login-blur-wrapper">
-                                <button type="button" class="btn-login-hero" style="background: none; border: none; cursor: pointer;" onclick="securePostRedirect('/Login/Index', { action: 'login_flow' })">
-                                    <svg class="icon icon-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
-                                    </svg>
-                                    <span>Логин</span>
-                                </button>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </td>
+        <div style="position: absolute; bottom: 20px; left: 0; width: 100%; padding: 0 20px; box-sizing: border-box; z-index: 10;">
+            <div class="hero-actions" style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                <a href="javascript:void(0);" onclick="sendSecureRedirect('', false)" class="btn btn-primary">
+                    <span>Заказать проект</span>
+                </a>
+                <a href="javascript:void(0);" onclick="sendSecureRedirect('', false)" class="btn btn-secondary">
+                    <span>Смотреть кейсы</span>
+                </a>
 
-        <td id="cntcts" class="contactspace">
-            <div class="contacts-mobile-wrapper">
-                <h2 class="servicesheader" style="text-align: center; margin-bottom: 20px; padding: 0;">Контакты</h2>
-
-                <div class="mobile-contact-card">
-                    <div class="contact-label">
-                        <img src="/img/Icons/Phone.svg" alt="Phone" />
-                        <span>Телефон</span>
-                    </div>
-                    <a href="tel:@contacts.Phone" class="contact-value">@contacts.Phone</a>
-                </div>
-
-                <div class="mobile-contact-card">
-                    <div class="contact-label">
-                        <img src="/img/Icons/EMail.svg" alt="Email" />
-                        <span>Email</span>
-                    </div>
-                    <a href="mailto:@contacts.Email" class="contact-value">@contacts.Email</a>
-                </div>
-
-                <div class="mobile-contact-card">
-                    <div class="contact-label">
-                        <img src="/img/Icons/Telegram.svg" alt="Telegram" />
-                        <span>Telegram</span>
-                    </div>
-                    <a href="https://t.me/@contacts.Telegram.Replace("@", "")" target="_blank" class="contact-value">@contacts.Telegram</a>
-                </div>
-
-                <div class="mobile-contact-card">
-                    <div class="contact-label">
-                        <img src="/img/Icons/Watsap.svg" alt="WhatsApp" />
-                        <span>WhatsApp</span>
-                    </div>
-                    <a href="https://wa.me/@contacts.WatsApp.Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "")" target="_blank" class="contact-value">@contacts.WatsApp</a>
-                </div>
-            </div>
-            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 20px 12px;" />
-        </td>
-    </tr>
-
-    <tr id="section-2">
-        <td>
-            <div class="servicesheader">Предоставляемые услуги</div>
-            <table id="srvces" class="workspace">
-                <tr id="srvcesPlaces">
-                    @if (services == null || services.Count == 0)
+                <div class="user-profile-container" style="position: relative; display: inline-block;">
+                    @if (User.Identity.IsAuthenticated)
                     {
-                        <td class="crdplace">
-                            <div class="service-card" style="text-align: center; color: red;">
-                                Services не загружены...
-                            </div>
-                        </td>
+                        <div class="login-blur-wrapper" style="position: relative; display: inline-block; margin-top: 10px;">
+                            @* Используем класс btn btn-login-hero для идентичности с кнопкой Логин *@
+                            <button type="button"
+                                    class="btn btn-login-hero"
+                                    onclick="toggleUserMenu(event)"
+                                    style="display: flex; align-items: center; justify-content: center; min-width: 140px;">
+
+                                <span>@(User.Identity.Name ?? "test4")</span>
+
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 8px;">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+
+                        @* Выпадающее меню *@
+                        <div id="userDropdown" class="user-dropdown-menu" style="position: absolute; top: 100%; right: 0; margin-top: 5px; background: #ffffff; min-width: 200px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 99999; padding: 6px 0; display: none;">
+
+                            <a class="user-dropdown-item"
+                               onclick="sendSecureRedirect('/PageInDevelopment/Index', false)"
+                               style="display: block; padding: 10px 16px; color: #374151; cursor: pointer; text-decoration: none; font-size: 14px;">
+                                Редактировать профиль
+                            </a>
+
+                            <div class="user-dropdown-divider" style="height: 1px; background-color: #e5e7eb; margin: 4px 0;"></div>
+
+                            <a class="user-dropdown-item"
+                               onclick="document.getElementById('logoutForm').submit();"
+                               style="display: block; padding: 10px 16px; color: #dc2626; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: 500;">
+                                Выход
+                            </a>
+                        </div>
                     }
                     else
                     {
-                        int i = 0;
-                        foreach (OrderFlow.Domain.MainPage.Models.Service serviceItem in services)
-                        {
-                            i = i + 1;
-                            <td id="crdPalc_@i" class="crdplace">
-                                <div id="crd_@i" class="service-card">
-                                    <div class="methodology-line blue-line"></div>
-                                    <h3>@serviceItem.Name</h3>
-                                    <p>@serviceItem.Description</p>
-                                </div>
-                            </td>
-                        }
+                        <button type="button" class="btn btn-login-hero" onclick="sendSecureRedirect('/Login/Index', {})">
+                            <span>Логин</span>
+                        </button>
                     }
-                </tr>
-            </table>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <div class="servicesheader">Методологии управления проектами</div>
-            <table class="workspace">
-                <tbody id="mdtlgy">
-                    <tr>
-                        <td class="methodology-crdplace">
-                            <div id="cdr" class="service-card">
-                                <div class="methodology-line blue-line"></div>
-                                <div class="card-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="#1A56DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px; height:20px;">
-                                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                                        <polyline points="17 6 23 6 23 12"></polyline>
-                                    </svg>
-                                </div>
-                                <h3>Waterfall</h3>
-                                <span class="methodology-type-badge">Каскадная модель</span>
-                                <p>Классический структурированный подход. Итоговая стоимость, детальное ТЗ и точные сроки фиксируются до начала разработки.</p>
-                                <div class="methodology-card-footer">
-                                    <span>Применение:</span>
-                                    <p>Enterprise-системы, ERP и проекты со строгим регламентом.</p>
-                                </div>
-                            </div>
-                        </td>
-
-                        <td class="methodology-crdplace">
-                            <div id="mdtlgy" class="service-card">
-                                <div class="methodology-line purple-line"></div>
-                                <div class="card-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px; height:20px;">
-                                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
-                                    </svg>
-                                </div>
-                                <h3>Прототипирование</h3>
-                                <span class="methodology-type-badge purple-badge">Agile / Итеративный подход</span>
-                                <p>Гибкая разработка с фокусом на быстрый запуск MVP за 2 недели. Динамическое изменение требований.</p>
-                                <div class="methodology-card-footer">
-                                    <span>Применение:</span>
-                                    <p>SaaS-платформы, стартапы и продукты с гибким рынком.</p>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <div class="servicesheader">Наши проекты (Портфолио)</div>
-            <table class="workspace">
-                <tbody>
-                    <tr id="prtflio">
-                        @if (portfolios == null || portfolios.Count == 0)
-                        {
-                            <td class="crdplace">
-                                <div class="service-card" style="text-align: center; color: red;">
-                                    Портфолио не загружено...
-                                </div>
-                            </td>
-                        }
-                        else
-                        {
-                            foreach (Portfolio portfolio in portfolios)
-                            {
-                                <td class="crdplace">
-                                    <div id="prtflio" class="service-card">
-                                        <div class="portfolio-line blue-line"></div>
-                                        <h3 class="portfolio-title">@portfolio.ProjectName.Title</h3>
-                                        <div style="font-size:14px; margin-bottom:6px; color:#374151;">
-                                            <strong>Стек:</strong> @portfolio.TechnologyName
-                                        </div>
-                                        <div style="font-size:14px; color:#374151;">
-                                            <strong>Методология:</strong> @portfolio.Metodology.Mtdology.Value.ToRussian()
-                                        </div>
-
-                                        <a href="#" class="portfolio-link" onclick="event.preventDefault(); securePostRedirect('/PageInDevelopment/Index', { projectId: '@portfolio.ProjectName.Title' });">
-                                            <span>Подробнее о кейсе</span>
-                                            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 1.1em; height: 1.1em;">
-                                                <path d="M2 8H14M14 8L10 4M14 8L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </td>
-                            }
-                        }
-                    </tr>
-                </tbody>
-            </table>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
-                <div class="servicesheader" style="margin-bottom: 0;">Отзывы наших клиентов</div>
-                <div style="padding: 0 12px;"></div>
+                </div>
             </div>
+        </div>
+    </div>
 
-            <table class="workspace">
-                <tbody>
-                    <tr id="fdbck">
-                        @if (feedbacks != null && feedbacks.Count > 0)
-                        {
-                            foreach (Feedback feedbackItem in feedbacks)
-                            {
-                                <td class="crdplace">
-                                    <div class="service-card">
-                                        <div class="reviews-line blue-line"></div>
-                                        <div class="reviews-rating">
-                                            @for (int k = 0; k < (int)feedbackItem.Raiting; k++)
-                                            {
-                                                <span>★</span>
-                                            }
-                                        </div>
-                                        <p class="reviews-text">"@feedbackItem.Text"</p>
-                                        <div class="reviews-author-meta">
-                                            @{
-                                                var words = feedbackItem.Name.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                                string initials = words.Length > 1 ? $"{words[0][0]}{words[1][0]}" : $"{words[0][0]}";
-                                            }
-                                            <div class="author-avatar">@initials.ToUpper()</div>
-                                            <div>
-                                                <h4 style="margin:0; font-size:14px; color:#111827;">@feedbackItem.Name</h4>
-                                                <small style="color:#6b7280;">@feedbackItem.Company</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                            }
-                        }
-                        else
-                        {
-                            <td class="crdplace">
-                                <div class="service-card" style="text-align:center; padding: 30px 20px;">
-                                    <div class="reviews-line blue-line" style="background-color:#d1d5db;"></div>
-                                    <h3 style="color:#374151; font-weight:700; margin:0 0 8px 0;">Отзывов пока нет</h3>
-                                    <p style="color:#6b7280; margin: 0;">Мы только заполняем этот раздел реальными кейсами.</p>
-                                </div>
-                            </td>
-                        }
-                    </tr>
-                </tbody>
-            </table>
+    <table id="area" class="workspace" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+
+        <tr id="section-2">
+            <td id="srvces" class="servicesplace" style="padding: 20px; display: block;">
+                <h2 class="servicesheader">Наши услуги</h2>
+                @if (services != null && services.Count > 0)
+                {
+                    <div class="services-list-mobile">@foreach (var s in services) {
+                        <div class="service-card"><h3>@s.Name</h3><p>@s.Description</p></div>
+                    }
+                </div>
+            } else
+            {
+                <div class="service-card" style="border: 1px dashed #D1D5DB; text-align: center; padding: 20px; color: #9CA3AF;"><p>Услуги не найдены</p></div>
+            }
         </td>
     </tr>
 
-    <tr>
-        <td style="padding: 12px;">
-            <div class="requisites-block" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow:hidden;">
-                <div style="padding: 18px 20px; background: #f9fafb; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between;">
-                    <h3 style="margin: 0; font-size: 15px; font-weight: 600; color:#111827;">Мои реквизиты</h3>
-                    <span style="font-size: 11px; background: #e5e7eb; padding: 2px 6px; border-radius: 4px; font-weight: 500; color:#374151;">Самозанятый</span>
-                </div>
+    <tr id="section-3">
+        <td id="cntcts" class="servicesplace" style="background: #f9fafb; padding: 20px; display: block;">
+            <h2 class="servicesheader">Контакты</h2>
+            <div style="font-size: 14px; display: flex; flex-direction: column; gap: 14px; color: #374151;">
+                @if (contacts != null)
+                {
+                    <div style="display: flex; align-items: center; gap: 10px;"><span>📞</span> <strong>Телефон:</strong> <a href="tel:@contacts.Phone">@contacts.Phone</a></div>
+                    <div style="display: flex; align-items: center; gap: 10px;"><span>✉️</span> <strong>Email:</strong> <a href="mailto:@contacts.Email">@contacts.Email</a></div>
+                    <div style="display: flex; align-items: center; gap: 10px;"><span>✈️</span> <strong>Telegram:</strong> <a href="https://t.me/@contacts.Telegram.TrimStart('@')">@contacts.Telegram</a></div>
+                    <div style="display: flex; align-items: center; gap: 10px;"><span>💬</span> <strong>WhatsApp:</strong> <a href="https://wa.me/@contacts.WatsApp.Replace(" ", "")">@contacts.WatsApp</a></div>
+                }
+                else
+                {
 
-                <div style="padding: 8px 20px;">
-                    <div class="req-row" style="display: flex; flex-direction: column; padding: 10px 0; border-bottom: 1px dashed #f3f4f6;">
-                        <div style="color: #6b7280; font-size: 12px; margin-bottom: 2px;">ФИО</div>
-                        <div style="font-size: 14px; font-weight: 500; color:#111827;">Смирнов Федор Александрович</div>
-                    </div>
-
-                    <div class="req-row" style="display: flex; flex-direction: column; padding: 10px 0; border-bottom: 1px dashed #f3f4f6;">
-                        <div style="color: #6b7280; font-size: 12px; margin-bottom: 2px;">ИНН</div>
-                        <div style="font-family: monospace; font-size: 15px; color:#111827; display:flex; align-items:center; justify-content:space-between;">
-                            <span>@details.Inn</span>
-                            <button title="Копировать" onclick="navigator.clipboard.writeText('@details.Inn')" style="background: none; border: none; cursor: pointer; color: #9ca3af; padding: 4px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="req-row" style="display: flex; flex-direction: column; padding: 10px 0; border-bottom: 1px dashed #f3f4f6;">
-                        <div style="color: #6b7280; font-size: 12px; margin-bottom: 2px;">Расчетный счет</div>
-                        <div style="font-family: monospace; font-size: 15px; color: #2563eb; font-weight:600; display:flex; align-items:center; justify-content:space-between;">
-                            <span>@details.Check</span>
-                            <button title="Копировать" onclick="navigator.clipboard.writeText('@details.Check')" style="background: none; border: none; cursor: pointer; color: #9ca3af; padding: 4px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="req-row" style="display: flex; flex-direction: column; padding: 10px 0;">
-                        <div style="color: #6b7280; font-size: 12px; margin-bottom: 2px;">Банк</div>
-                        <div style="font-size: 14px; color:#111827;">@details.BankName</div>
-                    </div>
-                </div>
-
-                <div style="padding: 12px 20px; background: #f9fafb; border-top: 1px solid #e5e7eb; text-align: right;">
-                    <button type="button" style="background: #ffffff; color: #374151; border: 1px solid #d1d5db; padding: 8px 16px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; width: 100%; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05)" onclick="navigator.clipboard.writeText('Смирнов Федор Александрович\nИНН: @details.Inn\nР/с: @details.Check\nБанк: @details.BankName'); alert('Все реквизиты скопированы в буфер обмена!');">
-                        Скопировать все реквизиты
-                    </button>
-                </div>
+                    <p>Данные контактов не указаны.</p>
+                }
             </div>
         </td>
     </tr>
+
+    <tr id="section-5">
+        <td class="servicesplace" style="background: #f9fafb; padding: 20px; display: block;">
+            <h2 class="servicesheader">Портфолио</h2>
+            @if (portfolios != null && portfolios.Count > 0)
+            {
+                <div class="services-list-mobile">
+                    @foreach (var p in portfolios)
+                    {
+                        <div class="service-card">
+                            <h3>@p.ProjectName.Title</h3><p>Стек: @p.TechnologyName</p>
+                                <a href="javascript:void(0);" onclick="sendSecureRedirect('', false)">Подробнее</a>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="service-card" style="border: 1px dashed #D1D5DB; text-align: center; padding: 30px; color: #9CA3AF;"><p>Портфолио пока пусто.</p></div>
+            }
+        </td>
+    </tr>
+
+    <tr id="section-6">
+        <td class="servicesplace" style="padding: 20px; display: block;">
+            <h2 class="servicesheader">Отзывы</h2>
+            @if (feedbacks != null && feedbacks.Count > 0)
+            {
+                <div class="services-list-mobile">
+                    @foreach (var f in feedbacks)
+                    {
+                        <div class="service-card"><div>@for(int i=0; i<(int)f.Raiting; i++){
+                            <span>★</span>
+                        }
+                    </div><p>@f.Text</p><small>@f.Name</small></div>
+                }
+            </div>
+        } else
+        {
+            <div class="service-card" style="border: 1px dashed #D1D5DB; text-align: center; padding: 30px; color: #9CA3AF;"><p>Отзывов пока нет</p></div>
+        }
+    </td>
+</tr>
 </table>
-
-<script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
-<script type="text/javascript" src="~/Scripts/Background_v1.js"></script>
+</div>
 
 <script type="text/javascript">
-    // ИСПРАВЛЕНО: Функция упаковки payload и выполнения безопасного POST-редиректа через туннель
-    function securePostRedirect(targetUrl, payloadData) {
-    try {
-    // Примешиваем защитный хэш текущей сессии во избежание Replay-атак
-    // Используем Html.Raw для сохранения символов типа '+' в хэше
-    const fullPayload = {
-    ...payloadData,
-    sessionHash: "@Html.Raw(ViewBag.SessionHash)"
-    };
+    // Функция переключения меню
+        function toggleUserMenu(event) {
+        if (event) {
+            event.stopPropagation();
+        }
 
-    const jsonString = JSON.stringify(fullPayload);
+        // Безопасная проверка: ищем элемент и проверяем его наличие
+        const dropdown = document.getElementById('userDropdown');
 
-    // Защищенное кодирование в Base64 (без падений на UTF-8/кириллице)
-    const encryptedData = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-    return String.fromCharCode(parseInt(p1, 16));
-    }));
-
-    // Конфигурируем динамическую форму под целевой URL и отправляем
-    const $form = $("#secureTunnelForm");
-    $form.attr("action", targetUrl);
-    $("#tunnelPayload").val(encryptedData);
-
-    $form[0].submit();
-    } catch (e) {
-    console.error("Критическая ошибка инициализации туннеля перенаправления:", e);
-    // Фолбэк на дефолтный GET в случае непредвиденного сбоя скрипта
-    window.location.href = targetUrl;
-    }
+        if (dropdown) {
+            dropdown.classList.toggle('show');
+        } else {
+            console.error("Элемент с ID 'userDropdown' не найден в DOM.");
+        }
     }
 
-    // Блок адаптивного выравнивания размеров ячеек таблицы
-    $("#prtflio").css("width", getWidthInPx(100));
-    $("#srvces").css("width", getWidthInPx(100));
-    $("#mdtlgy").css("width", getWidthInPx(100));
-    $("#cdr").css("width", getWidthInPx(100));
+    // Исправленный глобальный обработчик
+        document.addEventListener('click', (event) => {
+        const dropdown = document.getElementById('userDropdown');
+        const trigger = document.querySelector('.user-profile-name');
 
-    $(document).ready(function() {
-    $('#srvcesPlaces').find('td').each(function(index, element) {
-    $(this).css("width", getWidthInPx(100));
-    });
+        // Проверяем:
+        // 1. Существует ли меню
+        // 2. Является ли клик НЕ внутри меню
+        // 3. Является ли клик НЕ по кнопке (включая её содержимое)
+        if (dropdown && !dropdown.contains(event.target) && trigger && !trigger.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
     });
 
-    $("#srvcesPlaces").css("width", getWidthInPx(100));
-    $("#prtflio").css("width", getWidthInPx(99));
-    $("#fdbck").css("width", getWidthInPx(99));
+    // Функция перехода на логин (прямой переход, так как это страница входа)
+    function redirectToLogin() {
+        window.location.href = '/Login';
+    }
+    // Новая логика: перенаправление на заглушку или указанный URL
+    function sendSecureRedirect(targetUrl, isCustom = false) {
+        const finalUrl = isCustom ? targetUrl : '/PageInDevelopment/Index';
+        try {
+            const data = {
+                timestamp: new Date().getTime(),
+                target: finalUrl,
+                sessionHash: "@Html.Raw(ViewBag.SessionHash)"
+            };
+            const encryptedData = btoa(encodeURIComponent(JSON.stringify(data)).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16))));
+            const $form = $("#secureTunnelForm");
+            $form.attr("action", finalUrl);
+            $("#tunnelPayload").val(encryptedData);
+            $form[0].submit();
+        } catch (e) { window.location.href = finalUrl; }
+    }
 </script>

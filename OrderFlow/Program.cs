@@ -59,12 +59,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Подключение middleware детекции устройств (исправляет runtime сбои контроллеров)
+app.UseDetection();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
-// Подключение middleware детекции устройств (исправляет runtime сбои контроллеров)
-app.UseDetection();
 
 // Строгий порядок middleware безопасности ASP.NET Core
 app.UseAuthentication();
