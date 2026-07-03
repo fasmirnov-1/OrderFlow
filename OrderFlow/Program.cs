@@ -22,6 +22,9 @@ builder.Services.AddScoped<IPortfolioItemRepo, PortfolioItemRepo>();
 builder.Services.AddScoped<ITestimonialRepo, TestimonialRepo>();
 builder.Services.AddScoped<ISiteSettingRepo, SiteSettingRepo>();
 builder.Services.AddScoped<IAspNetUserTokenRepo, AspNetUserTokenRepo>();
+// Замените AspNetUserRepo на реальное имя вашего класса-реализации
+builder.Services.AddScoped<IAspNetUserRepo, AspNetUserRepo>();
+builder.Services.AddScoped<SessionManagerService>();
 
 // 4. СЕРВИСЫ УПРАВЛЕНИЯ СЕССИЯМИ И КРИПТО-ТУННЕЛЯМИ
 builder.Services.AddScoped<ITokenLifecycleService, TokenLifecycleService>();
