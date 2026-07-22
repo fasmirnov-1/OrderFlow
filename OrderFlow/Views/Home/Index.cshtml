@@ -29,6 +29,13 @@
 
 @Html.AntiForgeryToken()
 
+<!-- Баннер-предупреждение о необходимости функции (скрыт по умолчанию) -->
+<div id="cryptoWarningBanner" style="display:none; background: #fff3cd; color: #856404; border-bottom: 1px solid #ffeeba; padding: 12px 20px; text-align: center; font-size: 14px; position: relative; z-index: 100000; box-sizing: border-box;">
+    <span><strong>Внимание:</strong> Криптографическая защита (Web Crypto API) ограничена протоколом HTTP.</span>
+    <button type="button" onclick="runBrowserCryptoFix()" style="background: #856404; color: #fff; border: none; padding: 5px 12px; margin-left: 15px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;">Настроить браузер</button>
+    <button type="button" onclick="document.getElementById('cryptoWarningBanner').style.display='none';" style="background: transparent; border: none; font-size: 16px; font-weight: bold; cursor: pointer; margin-left: 10px; color: #856404;">&times;</button>
+</div>
+
 <table id="area" class="workspace">
     <tr id="section-1">
         <td class="heroplace">
@@ -61,12 +68,9 @@
                                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                                 </div>
 
-                                                @* Выпадающее меню с явным z-index и абсолютным позиционированием *@
                                                 <div id="userDropdown" class="user-dropdown-menu" style="display: none; position: absolute; top: 100%; right: 0; mt: 5px; background: #ffffff; min-width: 200px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 99999; padding: 6px 0;">
                                                     <a class="user-dropdown-item" onclick="securePostRedirect('/Profile/Edit', {})" style="display: block; padding: 10px 16px; color: #374151; cursor: pointer; text-decoration: none; font-size: 14px;">Редактировать профиль</a>
                                                     <div class="user-dropdown-divider" style="height: 1px; background-color: #e5e7eb; margin: 4px 0;"></div>
-
-                                                    @* Кнопка выхода отправляет запрос на правильный контроллер /Login/Logout *@
                                                     <a class="user-dropdown-item" onclick="handleLogout(event)" style="display: block; padding: 10px 16px; color: #dc2626; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: 500;">Выход</a>
                                                 </div>
                                             </div>
@@ -386,7 +390,7 @@
                         <div style="flex: 1; min-width: 160px; font-size: 13px; color: #6b7280;">Расчетный счет (Р/с)</div>
                         <div style="flex: 2; min-width: 220px; font-size: 14px; font-weight: 600; color: #2563eb; display: flex; align-items: center; justify-content: space-between;">
                             <span style="font-family: monospace; font-size: 15px; letter-spacing: 0.5px;">@details.Check</span>
-                            <button title="Копировать" onclick="navigator.clipboard.writeText('@details.Check')" style="background: none; border: none; cursor: pointer; color: #9ca3af; padding: 4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2 2v1"></path></svg></button>
+                            <button title="Копировать" onclick="navigator.clipboard.writeText('@details.Check')" style="background: none; border: none; cursor: pointer; color: #9ca3af; padding: 4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
                         </div>
                     </div>
                     <div class="req-row" style="display: flex; flex-wrap: wrap; padding: 12px 0; align-items: center;">
@@ -407,48 +411,57 @@
 <script type="text/javascript" src="~/Scripts/crypto-tunnel.js"></script>
 
 <script type="text/javascript">
+    // Автоматическая проверка при загрузке страницы
+    document.addEventListener("DOMContentLoaded", function() {
+        // Проверяем наличие криптографической функции
+        const isCryptoSupported = window.crypto && window.crypto.subtle && typeof window.crypto.subtle.digest === 'function';
+        if (!isCryptoSupported) {
+            var banner = document.getElementById("cryptoWarningBanner");
+            if (banner) {
+                banner.style.display = "block";
+            }
+        }
+    });
+
     // Открытие/закрытие меню через прямую манипуляцию стилем display
     function toggleUserDropdown(event) {
-    event.stopPropagation();
-    var dropdown = document.getElementById("userDropdown");
-    if (dropdown) {
-    if (dropdown.style.display === "none" || dropdown.style.display === "") {
-    dropdown.style.display = "block";
-    } else {
-    dropdown.style.display = "none";
-    }
-    }
+        event.stopPropagation();
+        var dropdown = document.getElementById("userDropdown");
+        if (dropdown) {
+            if (dropdown.style.display === "none" || dropdown.style.display === "") {
+                dropdown.style.display = "block";
+            } else {
+                dropdown.style.display = "none";
+            }
+        }
     }
 
     // Закрытие меню при клике в любую точку экрана
     window.addEventListener("click", function() {
-    var dropdown = document.getElementById("userDropdown");
-    if (dropdown) {
-    dropdown.style.display = "none";
-    }
+        var dropdown = document.getElementById("userDropdown");
+        if (dropdown) {
+            dropdown.style.display = "none";
+        }
     });
+
     // Специализированный метод для безопасного выхода из системы
     function handleLogout(event) {
-    event.preventDefault();
+        event.preventDefault();
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/Login/Logout';
 
-    // Ищем существующий на странице токен валидации (он есть в форме #loginForm)
-    var token = $('input[name="__RequestVerificationToken"]').val();
+        if (token) {
+            var tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = '__RequestVerificationToken';
+            tokenInput.value = token;
+            form.appendChild(tokenInput);
+        }
 
-    // Если туннель поддерживает передачу форм, шлем туда, либо отправляем стандартный POST
-    var form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/Login/Logout';
-
-    if (token) {
-    var tokenInput = document.createElement('input');
-    tokenInput.type = 'hidden';
-    tokenInput.name = '__RequestVerificationToken';
-    tokenInput.value = token;
-    form.appendChild(tokenInput);
-    }
-
-    document.body.appendChild(form);
-    form.submit();
+        document.body.appendChild(form);
+        form.submit();
     }
 
     async function securePostRedirect(targetUrl, payload) {
@@ -466,30 +479,29 @@
         }
     }
 
-    // Ниже идет ваш существующий код обработки ресайза и высоты таблиц...
     function isMobileLandscape() {
-    return window.matchMedia("(max-width: 667px) and (orientation: landscape)").matches;
+        return window.matchMedia("(max-width: 667px) and (orientation: landscape)").matches;
     }
 
     if (!isMobileLandscape()) {
-    $("#area").css("height", getHeightInPx(92));
-    $("#section-1").css("height", getHeightInPx(60));
-    $("#section-2").css("height", getHeightInPx(30));
-    $("#hro").css("height", getHeightInPx(60));
-    $("#cntcts").css("height", getHeightInPx(58));
+        $("#area").css("height", getHeightInPx(92));
+        $("#section-1").css("height", getHeightInPx(60));
+        $("#section-2").css("height", getHeightInPx(30));
+        $("#hro").css("height", getHeightInPx(60));
+        $("#cntcts").css("height", getHeightInPx(58));
     } else {
-    $("#area, #section-1, #section-2, #hro, #cntcts").css("height", "auto");
+        $("#area, #section-1, #section-2, #hro, #cntcts").css("height", "auto");
     }
 
     window.addEventListener("resize", function() {
-    if (isMobileLandscape()) {
-    $("#area, #section-1, #section-2, #hro, #cntcts").css("height", "auto");
-    } else {
-    $("#area").css("height", getHeightInPx(92));
-    $("#section-1").css("height", getHeightInPx(60));
-    $("#section-2").css("height", getHeightInPx(30));
-    $("#hro").css("height", getHeightInPx(60));
-    $("#cntcts").css("height", getHeightInPx(58));
-    }
+        if (isMobileLandscape()) {
+            $("#area, #section-1, #section-2, #hro, #cntcts").css("height", "auto");
+        } else {
+            $("#area").css("height", getHeightInPx(92));
+            $("#section-1").css("height", getHeightInPx(60));
+            $("#section-2").css("height", getHeightInPx(30));
+            $("#hro").css("height", getHeightInPx(60));
+            $("#cntcts").css("height", getHeightInPx(58));
+        }
     });
  </script>

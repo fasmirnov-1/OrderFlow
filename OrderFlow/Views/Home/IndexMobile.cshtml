@@ -18,6 +18,20 @@
     Details details = Model.Children[Types.Details];
 }
 
+<!-- Мобильный баннер-предупреждение -->
+<!-- Мобильный баннер-предупреждение без ошибок -->
+<div id="cryptoWarningBannerMobile" style="display:none; background: #fff3cd; color: #856404; border-bottom: 1px solid #ffeeba; padding: 10px 15px; text-align: center; font-size: 13px; position: relative; z-index: 100000; box-sizing: border-box;">
+    <span><strong>Внимание:</strong> Шифрование ограничено по HTTP.</span>
+    <button type="button" onclick="runMobileCryptoFix()" style="background: #856404; color: #fff; border: none; padding: 4px 10px; margin-left: 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500;">Настроить</button>
+    <button type="button" onclick="document.getElementById('cryptoWarningBannerMobile').style.display='none';" style="background: transparent; border: none; font-size: 15px; font-weight: bold; cursor: pointer; margin-left: 8px; color: #856404;">&times;</button>
+
+    <!-- Поле для удобного копирования ссылки на флаги в мобильном браузере -->
+    <div id="mobileCryptoFixContainer" style="margin-top: 8px; display: none; font-size: 12px;">
+        <span>Ссылка на настройки:</span>
+        <input type="text" id="mobileFlagsUrlInput" readonly style="width: 100%; max-width: 280px; padding: 3px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px; background: #fff; margin-top: 3px; display: block; margin-left: auto; margin-right: auto;" />
+    </div>
+</div>
+
 <form id="secureTunnelForm" method="post" style="display:none;">
     @Html.AntiForgeryToken()
     <input type="hidden" id="tunnelPayload" name="encryptedPayload" />
@@ -48,7 +62,6 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <div class="login-blur-wrapper" style="position: relative; display: inline-block; margin-top: 10px;">
-                            @* Используем класс btn btn-login-hero для идентичности с кнопкой Логин *@
                             <button type="button"
                                     class="btn btn-login-hero"
                                     onclick="toggleUserMenu(event)"
@@ -62,7 +75,6 @@
                             </button>
                         </div>
 
-                        @* Выпадающее меню *@
                         <div id="userDropdown" class="user-dropdown-menu" style="position: absolute; top: 100%; right: 0; margin-top: 5px; background: #ffffff; min-width: 200px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 99999; padding: 6px 0; display: none;">
 
                             <a class="user-dropdown-item"
@@ -98,92 +110,125 @@
                 <h2 class="servicesheader">Наши услуги</h2>
                 @if (services != null && services.Count > 0)
                 {
-                    <div class="services-list-mobile">@foreach (var s in services) {
-                        <div class="service-card"><h3>@s.Name</h3><p>@s.Description</p></div>
-                    }
-                </div>
-            } else
-            {
-                <div class="service-card" style="border: 1px dashed #D1D5DB; text-align: center; padding: 20px; color: #9CA3AF;"><p>Услуги не найдены</p></div>
-            }
-        </td>
-    </tr>
-
-    <tr id="section-3">
-        <td id="cntcts" class="servicesplace" style="background: #f9fafb; padding: 20px; display: block;">
-            <h2 class="servicesheader">Контакты</h2>
-            <div style="font-size: 14px; display: flex; flex-direction: column; gap: 14px; color: #374151;">
-                @if (contacts != null)
-                {
-                    <div style="display: flex; align-items: center; gap: 10px;"><span>📞</span> <strong>Телефон:</strong> <a href="tel:@contacts.Phone">@contacts.Phone</a></div>
-                    <div style="display: flex; align-items: center; gap: 10px;"><span>✉️</span> <strong>Email:</strong> <a href="mailto:@contacts.Email">@contacts.Email</a></div>
-                    <div style="display: flex; align-items: center; gap: 10px;"><span>✈️</span> <strong>Telegram:</strong> <a href="https://t.me/@contacts.Telegram.TrimStart('@')">@contacts.Telegram</a></div>
-                    <div style="display: flex; align-items: center; gap: 10px;"><span>💬</span> <strong>WhatsApp:</strong> <a href="https://wa.me/@contacts.WatsApp.Replace(" ", "")">@contacts.WatsApp</a></div>
+                    <div class="services-list-mobile">
+                        @foreach (var s in services)
+                        {
+                            <div class="service-card">
+                                <h3>@s.Name</h3>
+                                <p>@s.Description</p>
+                            </div>
+                        }
+                    </div>
                 }
                 else
                 {
-
-                    <p>Данные контактов не указаны.</p>
+                    <div class="service-card" style="border: 1px dashed #D1D5DB; text-align: center; padding: 20px; color: #9CA3AF;"><p>Услуги не найдены</p></div>
                 }
-            </div>
-        </td>
-    </tr>
+            </td>
+        </tr>
 
-    <tr id="section-5">
-        <td class="servicesplace" style="background: #f9fafb; padding: 20px; display: block;">
-            <h2 class="servicesheader">Портфолио</h2>
-            @if (portfolios != null && portfolios.Count > 0)
-            {
-                <div class="services-list-mobile">
-                    @foreach (var p in portfolios)
+        <tr id="section-3">
+            <td id="cntcts" class="servicesplace" style="background: #f9fafb; padding: 20px; display: block;">
+                <h2 class="servicesheader">Контакты</h2>
+                <div style="font-size: 14px; display: flex; flex-direction: column; gap: 14px; color: #374151;">
+                    @if (contacts != null)
                     {
-                        <div class="service-card">
-                            <h3>@p.ProjectName.Title</h3><p>Стек: @p.TechnologyName</p>
-                                <a href="javascript:void(0);" onclick="sendSecureRedirect('', false)">Подробнее</a>
-                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;"><span>📞</span> <strong>Телефон:</strong> <a href="tel:@contacts.Phone">@contacts.Phone</a></div>
+                        <div style="display: flex; align-items: center; gap: 10px;"><span>✉️</span> <strong>Email:</strong> <a href="mailto:@contacts.Email">@contacts.Email</a></div>
+                        <div style="display: flex; align-items: center; gap: 10px;"><span>✈️</span> <strong>Telegram:</strong> <a href="https://t.me/@contacts.Telegram.TrimStart('@')">@contacts.Telegram</a></div>
+                        <div style="display: flex; align-items: center; gap: 10px;"><span>💬</span> <strong>WhatsApp:</strong> <a href="https://wa.me/@contacts.WatsApp.Replace(" ", "")">@contacts.WatsApp</a></div>
+                    }
+                    else
+                    {
+                        <p>Данные контактов не указаны.</p>
                     }
                 </div>
-            }
-            else
-            {
-                <div class="service-card" style="border: 1px dashed #D1D5DB; text-align: center; padding: 30px; color: #9CA3AF;"><p>Портфолио пока пусто.</p></div>
-            }
-        </td>
-    </tr>
+            </td>
+        </tr>
 
-    <tr id="section-6">
-        <td class="servicesplace" style="padding: 20px; display: block;">
-            <h2 class="servicesheader">Отзывы</h2>
-            @if (feedbacks != null && feedbacks.Count > 0)
-            {
-                <div class="services-list-mobile">
-                    @foreach (var f in feedbacks)
-                    {
-                        <div class="service-card"><div>@for(int i=0; i<(int)f.Raiting; i++){
-                            <span>★</span>
+        <tr id="section-5">
+            <td class="servicesplace" style="background: #f9fafb; padding: 20px; display: block;">
+                <h2 class="servicesheader">Портфолио</h2>
+                @if (portfolios != null && portfolios.Count > 0)
+                {
+                    <div class="services-list-mobile">
+                        @foreach (var p in portfolios)
+                        {
+                            <div class="service-card">
+                                <h3>@p.ProjectName.Title</h3>
+                                <p>Стек: @p.TechnologyName</p>
+                                <a href="javascript:void(0);" onclick="sendSecureRedirect('', false)">Подробнее</a>
+                            </div>
                         }
-                    </div><p>@f.Text</p><small>@f.Name</small></div>
+                    </div>
                 }
-            </div>
-        } else
-        {
-            <div class="service-card" style="border: 1px dashed #D1D5DB; text-align: center; padding: 30px; color: #9CA3AF;"><p>Отзывов пока нет</p></div>
-        }
-    </td>
-</tr>
-</table>
+                else
+                {
+                    <div class="service-card" style="border: 1px dashed #D1D5DB; text-align: center; padding: 30px; color: #9CA3AF;"><p>Портфолио пока пусто.</p></div>
+                }
+            </td>
+        </tr>
+
+        <tr id="section-6">
+            <td class="servicesplace" style="padding: 20px; display: block;">
+                <h2 class="servicesheader">Отзывы</h2>
+                @if (feedbacks != null && feedbacks.Count > 0)
+                {
+                    <div class="services-list-mobile">
+                        @foreach (var f in feedbacks)
+                        {
+                            <div class="service-card">
+                                <div>
+                                    @for (int i = 0; i < (int)f.Raiting; i++)
+                                    {
+                                        <span>★</span>
+                                    }
+                                </div>
+                                <p>@f.Text</p>
+                                <small>@f.Name</small>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="service-card" style="border: 1px dashed #D1D5DB; text-align: center; padding: 30px; color: #9CA3AF;"><p>Отзывов пока нет</p></div>
+                }
+            </td>
+        </tr>
+    </table>
 </div>
 
 <script type="text/javascript">
-    // Функция переключения меню
-        function toggleUserMenu(event) {
+    // Автоматическая проверка при загрузке мобильной страницы
+    document.addEventListener("DOMContentLoaded", function () {
+        // Объявляем и сразу вызываем внутреннюю async-функцию, чтобы избежать SyntaxError с await
+        (async function () {
+            let isCryptoWorking = false;
+            try {
+                if (window.crypto && window.crypto.subtle) {
+                    const msgUint8 = new TextEncoder().encode("test");
+                    await window.crypto.subtle.digest("SHA-256", msgUint8);
+                    isCryptoWorking = true;
+                }
+            } catch (e) {
+                isCryptoWorking = false;
+            }
+
+            if (!isCryptoWorking) {
+                var banner = document.getElementById("cryptoWarningBannerMobile");
+                if (banner) {
+                    banner.style.display = "block";
+                }
+            }
+        })();
+    });
+
+    function toggleUserMenu(event) {
         if (event) {
             event.stopPropagation();
         }
-
-        // Безопасная проверка: ищем элемент и проверяем его наличие
         const dropdown = document.getElementById('userDropdown');
-
         if (dropdown) {
             dropdown.classList.toggle('show');
         } else {
@@ -191,25 +236,18 @@
         }
     }
 
-    // Исправленный глобальный обработчик
-        document.addEventListener('click', (event) => {
+    document.addEventListener('click', (event) => {
         const dropdown = document.getElementById('userDropdown');
         const trigger = document.querySelector('.user-profile-name');
-
-        // Проверяем:
-        // 1. Существует ли меню
-        // 2. Является ли клик НЕ внутри меню
-        // 3. Является ли клик НЕ по кнопке (включая её содержимое)
         if (dropdown && !dropdown.contains(event.target) && trigger && !trigger.contains(event.target)) {
             dropdown.classList.remove('show');
         }
     });
 
-    // Функция перехода на логин (прямой переход, так как это страница входа)
     function redirectToLogin() {
         window.location.href = '/Login';
     }
-    // Новая логика: перенаправление на заглушку или указанный URL
+
     function sendSecureRedirect(targetUrl, isCustom = false) {
         const finalUrl = isCustom ? targetUrl : '/PageInDevelopment/Index';
         try {
