@@ -37,5 +37,6 @@ namespace OrderFlow.Infrastructure.Repositories.Interfaces
         /// Удаляет шаблон письма по его идентификатору.
         /// </summary>
         Task DeleteAsync(int id);
+        Task<EmailTemplate?> GetActiveTemplateByNameAsync(string templateName);
     }
 }

@@ -32,5 +32,6 @@ namespace OrderFlow.Infrastructure.Repositories.Interfaces
         /// Удаляет токен безопасности по его составному первичному ключу.
         /// </summary>
         Task DeleteAsync(string userId, string loginProvider, string name);
+        Task<AspNetUserToken?> GetByTokenValueWithUserAsync(string tokenValue);
     }
 }

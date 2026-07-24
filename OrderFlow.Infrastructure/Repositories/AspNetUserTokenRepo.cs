@@ -93,5 +93,17 @@ namespace OrderFlow.Infrastructure.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        /// <summary>
+        /// Ищет токен сессии по его значению и возвращает токен вместе с привязанным пользователем.
+        /// </summary>
+        public async Task<AspNetUserToken?> GetByTokenValueWithUserAsync(string tokenValue)
+        {
+            if (string.IsNullOrWhiteSpace(tokenValue))
+                return null;
+
+            return await _context.AspNetUserTokens
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(t => t.Value == tokenValue);
+        }
     }
 }

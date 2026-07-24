@@ -78,5 +78,17 @@ namespace OrderFlow.Infrastructure.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<EmailTemplate?> GetActiveTemplateByNameAsync(string templateName)
+        {
+            if (string.IsNullOrWhiteSpace(templateName))
+            {
+                throw new ArgumentException("Имя шаблона не может быть пустым.", nameof(templateName));
+            }
+
+            // Ищем шаблон по имени, у которого IsActive == true (true! учитывает nullable тип bool?)
+            return await _context.EmailTemplates
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Name == templateName && t.IsActive == true);
+        }
     }
 }

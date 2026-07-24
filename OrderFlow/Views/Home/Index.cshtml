@@ -69,7 +69,8 @@
                                                 </div>
 
                                                 <div id="userDropdown" class="user-dropdown-menu" style="display: none; position: absolute; top: 100%; right: 0; mt: 5px; background: #ffffff; min-width: 200px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 99999; padding: 6px 0;">
-                                                    <a class="user-dropdown-item" onclick="securePostRedirect('/PageInDevelopment/Index', {})" style="display: block; padding: 10px 16px; color: #374151; cursor: pointer; text-decoration: none; font-size: 14px;">Редактировать профиль</a>
+                                                    <!-- РАБОЧИЙ ВЫЗОВ ПРОФИЛЯ ЧЕРЕЗ ТУННЕЛЬ -->
+                                                    <a class="user-dropdown-item" onclick="openProfileSession()" style="display: block; padding: 10px 16px; color: #374151; cursor: pointer; text-decoration: none; font-size: 14px;">Редактировать профиль</a>
                                                     <div class="user-dropdown-divider" style="height: 1px; background-color: #e5e7eb; margin: 4px 0;"></div>
                                                     <a class="user-dropdown-item" onclick="handleLogout(event)" style="display: block; padding: 10px 16px; color: #dc2626; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: 500;">Выход</a>
                                                 </div>
@@ -406,6 +407,12 @@
     </tr>
 </table>
 
+<!-- Скрытая форма для безопасного открытия профиля через крипто-туннель -->
+<form id="profileTunnelForm" asp-controller="Profile" asp-action="Index" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="profileEncryptedPayload" name="encryptedPayload" />
+</form>
+
 <script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
 <script type="text/javascript" src="~/Scripts/Background_v1.js"></script>
 <script type="text/javascript" src="~/Scripts/crypto-tunnel.js"></script>
@@ -413,7 +420,6 @@
 <script type="text/javascript">
     // Автоматическая проверка при загрузке страницы
     document.addEventListener("DOMContentLoaded", function() {
-        // Проверяем наличие криптографической функции
         const isCryptoSupported = window.crypto && window.crypto.subtle && typeof window.crypto.subtle.digest === 'function';
         if (!isCryptoSupported) {
             var banner = document.getElementById("cryptoWarningBanner");
@@ -479,6 +485,29 @@
         }
     }
 
+    // ИСПРАВЛЕННЫЙ МЕТОД: Формирование Base64 пакета аналогично авторизации и отправка через скрытую форму
+    async function openProfileSession() {
+        try {
+            const payload = {
+                action: "open_profile",
+                timestamp: Date.now()
+            };
+
+            const jsonString = JSON.stringify(payload);
+
+            const encryptedData = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+                return String.fromCharCode(parseInt(p1, 16));
+            }));
+
+            document.getElementById("profileEncryptedPayload").value = encryptedData;
+            document.getElementById("profileTunnelForm").submit();
+
+        } catch (error) {
+            console.error("Ошибка открытия профиля через туннель:", error);
+            window.location.href = '/Profile/Index';
+        }
+    }
+
     function isMobileLandscape() {
         return window.matchMedia("(max-width: 667px) and (orientation: landscape)").matches;
     }
@@ -504,4 +533,4 @@
             $("#cntcts").css("height", getHeightInPx(58));
         }
     });
- </script>
+</script>
