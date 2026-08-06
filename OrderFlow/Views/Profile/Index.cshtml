@@ -25,6 +25,9 @@
             <!-- Скрытый хэш сессии, поступающий из модели -->
             <input type="hidden" asp-for="sessionHash" />
 
+            <!-- Скрытое поле для передачи зашифрованного крипто-пакета через туннель -->
+            <input type="hidden" id="encryptedPayload" name="encryptedPayload" />
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <!-- Скрытое поле ID -->
@@ -65,7 +68,8 @@
                     else
                     {
                         <span style="font-size: 12px; font-weight: 500; color: #92400e; background-color: #fef3c7; padding: 10px 12px; border-radius: 6px; white-space: nowrap; border: 1px solid #fde68a;">Не подтвержден</span>
-                        <button type="submit" asp-controller="PageInDevelopment" asp-action="Index" class="btn-auth-submit" style="margin-top: 0; padding: 10px 14px; width: auto; font-size: 14px; background-color: #4b5563;" formnovalidate>Подтвердить</button>
+                        <!-- Кнопка отправки с переопределением экшена на EmailConfirm через туннель -->
+                        <button type="submit" formaction="@Url.Action("EmailConfirm", "Profile")" class="btn-auth-submit crypto-submit-btn" style="margin-top: 0; padding: 10px 14px; width: auto; font-size: 14px; background-color: #4b5563;" formnovalidate>Подтвердить</button>
                     }
                 </div>
                 <span asp-validation-for="Email" class="text-danger"></span>
@@ -130,16 +134,60 @@
             form.removeData("unobtrusiveValidation");
             $.validator.unobtrusive.parse(form);
 
+            // Обработка отправки формы с шифрованием данных для крипто-туннеля
             form.on("submit", function (e) {
-                if (document.activeElement && document.activeElement.hasAttribute("formnovalidate")) {
-                    return true;
-                        }
+                var clickedButton = document.activeElement;
 
-                        if (!form.valid()) {
+                // Если нажата кнопка подтверждения Email, упаковываем данные в крипто-пакет
+                if (clickedButton && clickedButton.classList.contains("crypto-submit-btn")) {
+                    e.preventDefault(); // Останавливаем стандартный сабмит для шифрования
+
+                    // Собираем данные формы в объект
+                    var formData = {
+                        Id: form.find("input[name='Id']").val(),
+                        UserName: form.find("input[name='UserName']").val(),
+                        Email: form.find("input[name='Email']").val(),
+                        FirstName: form.find("input[name='FirstName']").val(),
+                        LastName: form.find("input[name='LastName']").val(),
+                        PhoneNumber: form.find("input[name='PhoneNumber']").val(),
+                        sessionHash: form.find("input[name='sessionHash']").val()
+                    };
+
+                    try {
+                        // 1. Конвертируем объект в JSON строку
+                        var jsonString = JSON.stringify(formData);
+                        
+                        // 2. Экранируем URI (аналогично серверной логике)
+                        var encodedUriString = encodeURIComponent(jsonString);
+                        
+                        // 3. Кодируем в Base64 для крипто-туннеля
+                        var base64Payload = btoa(unescape(encodeURIComponent(encodedUriString))); // Корректная поддержка UTF-8 в btoa
+
+                        // Помещаем зашифрованный пакет в скрытое поле
+                        $("#encryptedPayload").val(base64Payload);
+
+                        // Устанавливаем целевой экшен кнопки (EmailConfirm) и отправляем форму
+                        form.attr("action", clickedButton.getAttribute("formaction") || "@Url.Action("EmailConfirm", "Profile")");
+                        
+                        // Отправляем форму напрямую без повторного срабатывания слушателя
+                        HTMLFormElement.prototype.submit.call(form[0]);
+                    } catch (err) {
+                        console.error("Ошибка шифрования крипто-пакета:", err);
+                        alert("Не удалось сформировать крипто-пакет для отправки.");
+                    }
+                    return;
+                }
+
+                // Стандартная логика для остальных кнопок (например, сохранение)
+                if (clickedButton && clickedButton.hasAttribute("formnovalidate")) {
+                    return true;
+                }
+
+                if (!form.valid()) {
                     e.preventDefault();
                     return false;
-                        }
-                    });
-                });
+                }
+            });
+        });
     </script>
 }

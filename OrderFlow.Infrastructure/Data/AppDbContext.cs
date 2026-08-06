@@ -61,6 +61,7 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<Technology> Technologies { get; set; }
 
     public virtual DbSet<Testimonial> Testimonials { get; set; }
+    public virtual DbSet<UserSession> UserSessions { get; set; }
 
     /*protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
@@ -315,6 +316,18 @@ public partial class AppDbContext : DbContext
         modelBuilder.Entity<Testimonial>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Testimon__3214EC070A6751C9");
+        });
+
+        modelBuilder.Entity<UserSession>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_UserSessions");
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+
+            entity.HasOne(d => d.User)
+                  .WithMany() // Или .WithMany(p => p.UserSessions), если вы решите добавить коллекцию в класс AspNetUser
+                  .HasForeignKey(d => d.UserId)
+                  .HasConstraintName("FK_UserSessions_AspNetUsers_UserId");
         });
 
         OnModelCreatingPartial(modelBuilder);

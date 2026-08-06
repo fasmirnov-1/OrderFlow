@@ -1,0 +1,38 @@
+﻿@{
+    Layout = null; // Отключаем базовый Layout, чтобы страница была изолированной
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email успешно подтвержден</title>
+    <link rel="stylesheet" href="~/Scripts/css/email-success.css" />
+</head>
+<body>
+
+    <div class="maintenance-container">
+        <div class="icon-wrapper">
+            <!-- Иконка успешного подтверждения (галочка или замок/щит) -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+
+        <div>
+            <h1>Email успешно подтвержден!</h1>
+            <p>Ваша электронная почта была успешно подтверждена. Теперь вам доступны все функции системы.</p>
+
+            <a href="@Url.Action("Index", "Home")" class="btn-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>На главную</span>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

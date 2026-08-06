@@ -1,0 +1,105 @@
+﻿/* Базовый сброс и центрирование */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #111827;
+}
+
+.main-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-container {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+/* Центральная белая карточка */
+.content-card {
+    background: #ffffff;
+    padding: 48px 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+    text-align: center;
+    max-width: 480px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Контейнер для иконки с мягким светло-синим фоном */
+.icon-container {
+    width: 64px;
+    height: 64px;
+    background-color: #eef2ff; /* Мягкий оттенок синего */
+    color: #3b82f6; /* Цвет самой иконки */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px auto;
+}
+
+/* Заголовок карточки */
+.card-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 12px;
+    margin-top: 0;
+}
+
+/* Основной текст сообщения (ошибка) */
+.card-description {
+    font-size: 15px;
+    color: #4b5563;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+/* Дополнительный поясняющий текст */
+.card-sub-description {
+    font-size: 13px;
+    color: #9ca3af;
+    line-height: 1.4;
+    margin-bottom: 32px;
+}
+
+/* Кнопка «Вернуться назад» */
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #2563eb;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    width: 100%;
+    box-sizing: border-box;
+    /* Добавьте эти строки, чтобы элемент точно принимал клики */
+    position: relative;
+    z-index: 10;
+    cursor: pointer;
+}
+
+    .back-button:hover {
+        background-color: #1d4ed8;
+        color: #ffffff;
+        text-decoration: none;
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }

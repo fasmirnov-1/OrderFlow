@@ -24,20 +24,27 @@ namespace OrderFlow.Infrastructure.Mail
 
             using var client = new SmtpClient();
 
-            // Устанавливаем таймаут соединения (например, 10 секунд), чтобы приложение не зависало наглухо при проблемах с сетью
-            client.Timeout = 10000;
+            // Создаем токен с жестким ограничением в 10 секунд для предотвращения зависания
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-            // Подключаемся к SMTP-серверу
-            await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.SmtpPort, SecureSocketOptions.StartTls);
+            try
+            {
+                // Подключаемся к Gmail через StartTls с токеном отмены
+                await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.SmtpPort, SecureSocketOptions.StartTls, cts.Token);
 
-            // Аутентифицируемся с расшифрованным паролем
-            await client.AuthenticateAsync(_emailSettings.Username, decryptedPassword);
+                // Аутентифицируемся
+                await client.AuthenticateAsync(_emailSettings.Username, decryptedPassword, cts.Token);
 
-            // Отправляем сообщение
-            await client.SendAsync(emailMessage);
+                // Отправляем сообщение
+                await client.SendAsync(emailMessage, cts.Token);
 
-            // Корректно разрываем соединение
-            await client.DisconnectAsync(true);
+                // Корректно разрываем соединение
+                await client.DisconnectAsync(true, cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Превышено время ожидания соединения с SMTP-сервером Google. Проверьте интернет-соединение или блокировку портов.");
+            }
         }
 
         private MimeMessage CreateEmailMessage(string toEmail, string subject, string body)

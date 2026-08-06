@@ -26,6 +26,11 @@ builder.Services.AddScoped<ISiteSettingRepo, SiteSettingRepo>();
 builder.Services.AddScoped<IAspNetUserTokenRepo, AspNetUserTokenRepo>();
 builder.Services.AddScoped<IAspNetUserRepo, AspNetUserRepo>();
 builder.Services.AddSingleton<SessionManagerService>();
+builder.Services.AddScoped<IEmailTemplateRepo, EmailTemplateRepo>();
+// Регистрация репозитория сессий
+builder.Services.AddScoped<IUserSessionsRepo, UserSessionsRepo>();
+// Регистрация фонового сервиса очистки сессий
+builder.Services.AddHostedService<SessionCleanupService>();
 
 // 4. СЕРВИСЫ УПРАВЛЕНИЯ СЕССИЯМИ, КРИПТО-ТУННЕЛЯМИ И ПОЧТОЙ
 builder.Services.AddScoped<ITokenLifecycleService, TokenLifecycleService>();
@@ -35,6 +40,7 @@ builder.Services.AddScoped<CustomCookieAuthenticationEvents>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 // Регистрируем EmailService для внедрения
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<EmailConfirmationService>();
 
 // 5. НАСТРОЙКА АУТЕНТИФИКАЦИИ (COOKIE BINDING)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
