@@ -18,7 +18,6 @@
     Details details = Model.Children[Types.Details];
 }
 
-<!-- Мобильный баннер-предупреждение -->
 <!-- Мобильный баннер-предупреждение без ошибок -->
 <div id="cryptoWarningBannerMobile" style="display:none; background: #fff3cd; color: #856404; border-bottom: 1px solid #ffeeba; padding: 10px 15px; text-align: center; font-size: 13px; position: relative; z-index: 100000; box-sizing: border-box;">
     <span><strong>Внимание:</strong> Шифрование ограничено по HTTP.</span>
@@ -37,6 +36,12 @@
     <input type="hidden" id="tunnelPayload" name="encryptedPayload" />
 </form>
 
+<!-- Скрытая форма для безопасного открытия профиля через крипто-туннель -->
+<form id="profileTunnelForm" asp-controller="Profile" asp-action="Index" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" id="profileEncryptedPayload" name="encryptedPayload" />
+</form>
+
 <form id="logoutForm" method="post" action="/Login/Logout" style="display:none;">
     @Html.AntiForgeryToken()
 </form>
@@ -51,10 +56,10 @@
 
         <div style="position: absolute; bottom: 20px; left: 0; width: 100%; padding: 0 20px; box-sizing: border-box; z-index: 10;">
             <div class="hero-actions" style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-                <a href="javascript:void(0);" onclick="sendSecureRedirect('', false)" class="btn btn-primary">
+                <a href="javascript:void(0);" onclick="securePostRedirect('/PageInDevelopment/Index', { action: 'order' })" class="btn btn-primary">
                     <span>Заказать проект</span>
                 </a>
-                <a href="javascript:void(0);" onclick="sendSecureRedirect('', false)" class="btn btn-secondary">
+                <a href="javascript:void(0);" onclick="securePostRedirect('/PageInDevelopment/Index', { action: 'cases' })" class="btn btn-secondary">
                     <span>Смотреть кейсы</span>
                 </a>
 
@@ -77,8 +82,9 @@
 
                         <div id="userDropdown" class="user-dropdown-menu" style="position: absolute; top: 100%; right: 0; margin-top: 5px; background: #ffffff; min-width: 200px; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 99999; padding: 6px 0; display: none;">
 
+                            <!-- ПРАВИЛЬНЫЙ ВЫЗОВ ПРОФИЛЯ С ИСПОЛЬЗОВАНИЕМ КРИПТО-ТУННЕЛЯ ИЗ Index.cshtml -->
                             <a class="user-dropdown-item"
-                               onclick="sendSecureRedirect('/PageInDevelopment/Index', false)"
+                               onclick="openMobileProfileSession()"
                                style="display: block; padding: 10px 16px; color: #374151; cursor: pointer; text-decoration: none; font-size: 14px;">
                                 Редактировать профиль
                             </a>
@@ -86,7 +92,7 @@
                             <div class="user-dropdown-divider" style="height: 1px; background-color: #e5e7eb; margin: 4px 0;"></div>
 
                             <a class="user-dropdown-item"
-                               onclick="document.getElementById('logoutForm').submit();"
+                               onclick="handleLogout(event)"
                                style="display: block; padding: 10px 16px; color: #dc2626; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: 500;">
                                 Выход
                             </a>
@@ -94,7 +100,7 @@
                     }
                     else
                     {
-                        <button type="button" class="btn btn-login-hero" onclick="sendSecureRedirect('/Login/Index', {})">
+                        <button type="button" class="btn btn-login-hero" onclick="securePostRedirect('/Login/Index', {})">
                             <span>Логин</span>
                         </button>
                     }
@@ -157,7 +163,7 @@
                             <div class="service-card">
                                 <h3>@p.ProjectName.Title</h3>
                                 <p>Стек: @p.TechnologyName</p>
-                                <a href="javascript:void(0);" onclick="sendSecureRedirect('', false)">Подробнее</a>
+                                <a href="/PageInDevelopment/Index" onclick="event.preventDefault(); securePostRedirect('/PageInDevelopment/Index', { projectId: '@p.ProjectName.Title' });">Подробнее</a>
                             </div>
                         }
                     </div>
@@ -199,11 +205,13 @@
     </table>
 </div>
 
+<script type="text/javascript" src="~/Scripts/jquery-4.0.0.min.js"></script>
+<script type="text/javascript" src="~/Scripts/crypto-tunnel.js"></script>
+
 <script type="text/javascript">
     // Автоматическая проверка при загрузке мобильной страницы
-    document.addEventListener("DOMContentLoaded", function () {
-        // Объявляем и сразу вызываем внутреннюю async-функцию, чтобы избежать SyntaxError с await
-        (async function () {
+    document.addEventListener("DOMContentLoaded", function() {
+        (async function() {
             let isCryptoWorking = false;
             try {
                 if (window.crypto && window.crypto.subtle) {
@@ -231,6 +239,12 @@
         const dropdown = document.getElementById('userDropdown');
         if (dropdown) {
             dropdown.classList.toggle('show');
+            // Дублируем управление style.display для абсолютной надежности на мобильных
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
+            }
         } else {
             console.error("Элемент с ID 'userDropdown' не найден в DOM.");
         }
@@ -238,29 +252,68 @@
 
     document.addEventListener('click', (event) => {
         const dropdown = document.getElementById('userDropdown');
-        const trigger = document.querySelector('.user-profile-name');
+        const trigger = document.querySelector('.user-profile-container');
         if (dropdown && !dropdown.contains(event.target) && trigger && !trigger.contains(event.target)) {
             dropdown.classList.remove('show');
+            dropdown.style.display = "none";
         }
     });
 
-    function redirectToLogin() {
-        window.location.href = '/Login';
+    // Специализированный метод для безопасного выхода из системы (синхронизирован с Index.cshtml)
+    function handleLogout(event) {
+        event.preventDefault();
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/Login/Logout';
+
+        if (token) {
+            var tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = '__RequestVerificationToken';
+            tokenInput.value = token;
+            form.appendChild(tokenInput);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
     }
 
-    function sendSecureRedirect(targetUrl, isCustom = false) {
-        const finalUrl = isCustom ? targetUrl : '/PageInDevelopment/Index';
+    async function securePostRedirect(targetUrl, payload) {
         try {
-            const data = {
-                timestamp: new Date().getTime(),
-                target: finalUrl,
-                sessionHash: "@Html.Raw(ViewBag.SessionHash)"
+            const response = await sendTunnelRequest(targetUrl, payload);
+            if (response.ok) {
+                window.location.href = targetUrl;
+            } else {
+                console.warn("Туннель отклонен сервером, пробуем прямой переход.");
+                window.location.href = targetUrl;
+            }
+        } catch (e) {
+            console.error("Ошибка крипто-туннеля:", e);
+            window.location.href = targetUrl;
+        }
+    }
+
+    // Метод для безопасного открытия профиля через крипто-туннель (синхронизирован с Index.cshtml)
+    async function openMobileProfileSession() {
+        try {
+            const payload = {
+                action: "open_profile",
+                timestamp: Date.now()
             };
-            const encryptedData = btoa(encodeURIComponent(JSON.stringify(data)).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16))));
-            const $form = $("#secureTunnelForm");
-            $form.attr("action", finalUrl);
-            $("#tunnelPayload").val(encryptedData);
-            $form[0].submit();
-        } catch (e) { window.location.href = finalUrl; }
+
+            const jsonString = JSON.stringify(payload);
+
+            const encryptedData = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+                return String.fromCharCode(parseInt(p1, 16));
+            }));
+
+            document.getElementById("profileEncryptedPayload").value = encryptedData;
+            document.getElementById("profileTunnelForm").submit();
+
+        } catch (error) {
+            console.error("Ошибка открытия профиля через туннель:", error);
+            window.location.href = '/Profile/Index';
+        }
     }
 </script>

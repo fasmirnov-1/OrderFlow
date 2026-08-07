@@ -202,7 +202,7 @@ namespace OrderFlow.Controllers
         {
             if (string.IsNullOrEmpty(encryptedPayload))
             {
-                return View("Error", "Некорректная ссылка подтверждения.");
+                return View("ConfirmationError", "Некорректная ссылка подтверждения.");
             }
 
             try
